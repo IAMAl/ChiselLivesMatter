@@ -18,6 +18,7 @@ class Sft extends Module {
         when (io.fc3 === (params.Parameters.FC3_SR).U) {
             when (io.fc7 === (params.Parameters.FC7_ART).U) {
                 //Arithmetic Right Shift
+                //Signed Integer makes Sign-fill
                 io.dst   := (io.rs1.asSInt >> io.rs2(4, 0)).asUInt
             }
             .elsewhen (io.fc7 === (params.Parameters.FC7_LGC).U) {

@@ -36,14 +36,14 @@ object Parameters {
     val LSB_Fc7     = OpcWidth + Fc3Width + 3*LogNumReg
     val MSB_Fc7     = ISAWidth - 1
 
-    //Opcode Encode
+    //Opcode Type
     val OP_BRJMP    = 0x6   //Branch/Jump
     val OP_LOAD     = 0x0   //Load
     val OP_STORE    = 0x2   //Store
     val OP_RandI    = 0x1   //Register and Immediate
     val OP_RandR    = 0x3   //Register and Register
-    val OP_JAL      = 0x3
-    val OP_JALR     = 0x1
+    val OP_JAL      = 0x3   //Jump and Link
+    val OP_JALR     = 0x1   //
     
     //FC-3 Encode
     //Adder

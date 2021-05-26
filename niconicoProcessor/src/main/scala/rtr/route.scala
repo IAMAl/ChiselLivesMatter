@@ -27,6 +27,9 @@ class URT extends Module {
     //Register
     val UnitID  = Reg(UInt(3.W))
     val EnWB    = Reg(Bool())
+    val is_ALU  = Reg(Bool())
+    val is_LSU  = Reg(Bool())
+    val is_BRU  = Reg(Bool())
 
     //Assign
     //Routing (UnitID) Assignment and Write-Back Enable
@@ -48,7 +51,13 @@ class URT extends Module {
     //Output
     io.UnitID   := UnitID
     io.EnWB     := EnWB
-    io.is_ALU   := (UnitID === (params.Parameters.OP_RandI).U) || (UnitID === (params.Parameters.OP_RandR).U)
-    io.is_LSU   := (UnitID === (params.Parameters.OP_LOAD).U)  || (UnitID === (params.Parameters.OP_STORE).U)
-    io.is_BRU   := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U)
+
+    is_ALU      := (UnitID === (params.Parameters.OP_RandI).U) || (UnitID === (params.Parameters.OP_RandR).U)
+    io.is_ALU   := is_ALU
+
+    is_LSU      := (UnitID === (params.Parameters.OP_LOAD).U)  || (UnitID === (params.Parameters.OP_STORE).U)
+    io.is_LSU   := is_LSU
+
+    is_BRU      := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U)
+    io.is_BRU   := is_BRU
 }

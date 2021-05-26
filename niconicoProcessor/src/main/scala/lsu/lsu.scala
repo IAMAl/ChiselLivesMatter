@@ -11,6 +11,58 @@ import chisel3.util._
 import params._
 import isa._
 
+
+class LdReq extends Module {
+
+    val io extends Bundle {   
+        val LdReq   = Input( Bool())
+        val LdAck   = Input( Bool())
+        val Stall   = Input( Bool())
+        val Req     = Output(Bool())
+        val LdValid = Output(Bool())
+        val Busy    = Output(Bool())
+    })
+
+    //Register
+    val FSM     = RegInit(UInt(1.W), 0.U)
+
+    io.Busy     := (FSM === 1.U)
+
+    io.LdValid  := DontCare
+    io.Req      := DontCare
+    when (FSM) {
+        is (0.U) {  //Init
+            when (io.LdReq && !io.Stall) {
+                io.Req      := true.B
+                io.LdValid  := false.B
+                FSM         := 1.U
+            }
+            .otherwise {
+                io.Req      := false.B
+                io.LdValid  := false.B
+                FSM         := 0.U                
+            }
+        }
+        is (1.U) {  //In Loading
+            when (io.LdReq && !io.Stall) {
+                io.Req      := true.B
+                io.LdValid  := io.LdAck
+                FSM         := 1.U
+            }
+            .elsewhen(!io.LdReq) {
+                io.Req      := false.B
+                io.LdValid  := false.B
+                FSM         := 0.U
+            }
+            .otherwise {
+                io.Req      := true.B
+                io.LdValid  := false.B
+                FSM         := 1.U                
+            }
+        }
+    }
+}
+
 class LSU extends Module {
 
     /* I/O                          */
@@ -18,19 +70,18 @@ class LSU extends Module {
 
     /* Module                       */
     val ISA_fc3_lsu = Module(new ISA_fc3_lsu)               //Func3 Decoder
+    val LdReq       = Module(new LdReq)                     //Load Request Controller
 
     /* Register                     */
-    val vld = RegInit(Bool(), false.B)                      //Validation
-    val ack = RegInit(Bool(), false.B)                      //Nack
-    val mar = Reg(UInt((params.Parameters.DatWidth).W))     //Memory Address Register (MAR)
-    val mdr = Reg(UInt((params.Parameters.DatWidth).W))     //Memory Data Register (MDR)
-
-    val ld  = RegInit(Bool(), false.B)                      //Load  Instruction Flag
+    val mar     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Address Register (MAR)
+    val mdr     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Data Register (MDR)
+    val LdDone  = RegInit(Bool(), false.B)                  //
 
     /* Wire                         */
-    val st  = Wire(Bool())                                  //Store Instruction Flag
-    val dat = Wire(UInt((params.Parameters.DatWidth).W))    //Load Data
-    val msk = Wire(SInt((params.Parameters.DatWidth).W))    //Access Mask
+    val is_Ld   = Wire(Bool())                              //Load  Instruction Flag
+    val is_St   = Wire(Bool())                              //Store Instruction Flag
+    val dat     = Wire(UInt((params.Parameters.DatWidth).W))//Load Data
+    val msk     = Wire(SInt((params.Parameters.DatWidth).W))//Access Mask
 
     /* Assign                       */
     //Func3 Decode
@@ -63,74 +114,70 @@ class LSU extends Module {
     }
 
     //MAR & MDR Porting
-    //Check Instruction is Store or not
-    st  := io.vld && (io.opc === (params.Parameters.OP_STORE).U)
-
     //Check Instruction is Load or not
-    when (io.vld && (io.opc === (params.Parameters.OP_LOAD).U)) {
-        ld  := true.B
+    is_Ld   := io.vld && (io.opc === (params.Parameters.OP_LOAD).U)
+
+    //Check Instruction is Store or not
+    is_St   := io.vld && (io.opc === (params.Parameters.OP_STORE).U)
+
+    //Loading Path
+    when (!io.vld && !LdReq.io.Busy) {
+        LdDone  := false.B
     }
-    .elsewhen (!vld && io.dack) {
-        ld  := false.B
+    .elsewhen (LdReq.io.io.LdValid) {
+        LdDone  := true.B
+    }
+    LdReq.io.Stall  := false.B  //ToDo
+    LdReq.io.LdReq  := is_Ld
+    LdReq.io.LdAck  := io.dack
+
+    //Set Memory Address Register
+    when (io.vld) {
+        mar := io.rs1 + io.imm
     }
 
-    when (io.vld || (vld && io.dack)) {
-        //Memory Address Register
-        when (io.vld) {
-            mar := io.rs1 + io.imm
-        }
-
-        //Memory Data Register
-        when (st) {
-            //Store
-            mdr := io.rs2 & msk.asUInt
-        }
-        .elsewhen (ld) {
+    //Set Memory Data Register
+    when (is_St) {
+        //Store
+        //Mask is used for Byte, and Half-Word Accesses
+        mdr := io.rs2 & msk.asUInt
+    }
+    .elsewhen (LdReq.io.io.LdValid) {
             //Load
             mdr := dat
         }
     }
 
-    //Access Validation
-    when (io.vld ^ io.dack) {
-        vld := true.B
-    }
-    .elsewhen (!ack) {
-        vld := false.B
-    }
-
-    //Nack Generation
-    when (vld) {
-        ack := io.dack
-    }
-
     //Output
-    //Quarter-Word Access
     when (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_BYTE).U) {
+        //1-Byte Access
         io.csel(0) := 1.U
         io.csel(1) := 0.U
         io.csel(2) := 0.U
         io.csel(3) := 0.U
 
         msk := 0x000000FF.S
-    }   //Half-Word Access
+    }
     .elsewhen (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_HWORD).U) {
+        //2-Byte Access
         io.csel(0) := 1.U
         io.csel(1) := 1.U
         io.csel(2) := 0.U
         io.csel(3) := 0.U
 
         msk := 0x0000FFFF.S
-    }   //Single-Word Access
+    }
     .elsewhen (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_WORD).U) {
+        //4-Byte Access
         io.csel(0) := 1.U
         io.csel(1) := 1.U
         io.csel(2) := 1.U
         io.csel(3) := 1.U
 
         msk := 0xFFFFFFFF.S
-    }   //Disable to Access
+    }
     .otherwise {
+        //Disable to Access
         io.csel(0) := 0.U
         io.csel(1) := 0.U
         io.csel(2) := 0.U
@@ -138,10 +185,10 @@ class LSU extends Module {
 
         msk := 0x00000000.S
     }
-    io.dreq  := vld && ack
-    io.stor  := st
+    io.dreq  := LdReq.io.Req
+    io.stor  := is_St
     io.dmar  := mar
     io.dst   := mdr
     io.odat  := mdr
-    io.wrb   := ld && ack
+    io.wrb   := LdDone
 }

@@ -15,8 +15,10 @@ class Add extends Module {
 
     //Wire
     val rs2     = Wire(UInt((params.Parameters.DatWidth).W))
+    val c_in    = Wire(UInt(1.W))
 
     //Assign
+    //Selection of Right-Source Operand
     when (io.fc7 === (params.Parameters.FC7_SUB).U) {
         //1's Complement for Subtraction
         rs2 := ~io.rs2
@@ -31,9 +33,11 @@ class Add extends Module {
     }
 
     //Addition
+    //Carry-in for Subtraction to make 2's Complemt Binary
+    c_in    := (io.fc7 === (params.Parameters.FC7_SUB).U).asUInt
     when (io.vld) {
         //Addition
-        io.dst   := io.rs1 + rs2 + (io.fc7 === (params.Parameters.FC7_SUB).U).asUInt
+        io.dst   := io.rs1 + rs2 + c_in
     }
     .otherwise {
         //NOP

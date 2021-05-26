@@ -14,7 +14,7 @@ class ISplit extends Module {
     val io = IO(new ISplit_IO)
 
     /* Register                 */
-    //Hold Bit-Fields
+    //Captures Bit-Fields in Instruction
     val opc = Reg(UInt((params.Parameters.OpcWidth).W))
     val wno = Reg(UInt((params.Parameters.LogNumReg).W))
     val rn1 = Reg(UInt((params.Parameters.LogNumReg).W))

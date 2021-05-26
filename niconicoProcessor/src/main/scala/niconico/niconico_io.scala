@@ -8,7 +8,6 @@ import chisel3.util._
 import params._
 
 class NICO2_IO extends Bundle {  
-
     val boot = Input( Bool())                               //Boot Signal
 
     val ireq = Output(Bool())                               //Instruction Fetch Request

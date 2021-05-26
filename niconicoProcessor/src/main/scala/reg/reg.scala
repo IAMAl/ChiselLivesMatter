@@ -20,20 +20,20 @@ class REG extends Module {
     val RF      = RegInit(0.U.asTypeOf(Vec(NumReg, UInt((params.Parameters.DatWidth).W))))
 
     //Pipeline Registers
-    val exe     = RegInit(Bool(), false.B)
-    val rs1     = Reg(UInt((params.Parameters.DatWidth).W))
-    val rs2     = Reg(UInt((params.Parameters.DatWidth).W))
-    val opcode  = Reg(UInt((params.Parameters.OpcWidth).W))
+    val exe     = RegInit(Bool(), false.B)                      //Exec Validation
+    val rs1     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Source-1
+    val rs2     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile SOurce-2
+    val opcode  = Reg(UInt((params.Parameters.OpcWidth).W))     //Opcode
 
-    val imm     = Reg(UInt((params.Parameters.ImmWidth+1).W))
-    val rn1     = Reg(UInt((params.Parameters.LogNumReg).W))
-    val rn2     = Reg(UInt((params.Parameters.LogNumReg).W))
-    val fc3     = Reg(UInt((params.Parameters.Fc3Width).W))
-    val fc7     = Reg(UInt((params.Parameters.Fc7Width).W))
+    val imm     = Reg(UInt((params.Parameters.ImmWidth+1).W))   //Immediate
+    val rn1     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for Source-1
+    val rn2     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for SOurce-2
+    val fc3     = Reg(UInt((params.Parameters.Fc3Width).W))     //Func3
+    val fc7     = Reg(UInt((params.Parameters.Fc7Width).W))     //Func7
 
 
     //Assign
-    //Immediate Composition
+    //Immediate's Pre-Formatting
     when (io.opc === (params.Parameters.OP_STORE).U) {      //Store
         imm := Cat(io.fc7, io.wno)
     }
@@ -77,55 +77,63 @@ class REG extends Module {
         }
     }
 
-    //Output
-    exe         := io.vld
+    //Output to Follower Pipeline Stage
+    exe         := io.vld   //Exec Validation
     io.exe      := exe
 
-    opcode      := io.opc
+    opcode      := io.opc   //Send Opcode
     io.opcode   := opcode
 
-    rn1         := io.rn1
+    rn1         := io.rn1   //RegisterFile No for Source-1
     io.rn1_o    := rn1
 
-    rn2         := io.rn2
+    rn2         := io.rn2   //RegisterFile No for Source-2
     io.rn2_o    := rn2
 
-    fc3         := io.fc3
+    fc3         := io.fc3   //Func3
     io.fc3_o    := fc3
 
-    fc7         := io.fc7
+    fc7         := io.fc7   //Func7
     io.fc7_o    := fc7
     
     //Arithmetic Source Operands
     when ((io.opc === (params.Parameters.OP_RandI).U) || (io.opc === (params.Parameters.OP_RandR).U)) {
+        //Set Source Operands for
+        // Source-1&2 are from RegisterFile
+        // SOurce-1 is from RegisterFile
         io.as1  := rs1
         io.as2  := rs2
     }
     .otherwise {
+        //Otherwise NOT Send Value
         io.as1  := 0.U
         io.as2  := 0.U
     }
 
     //Load/Store Source Operands
     when ((io.opc === (params.Parameters.OP_STORE).U) || (io.opc === (params.Parameters.OP_LOAD).U)) {
+        //Set Load/Store Reference Data
         io.ls1  := rs1
         io.ls2  := rs2
     }
     .otherwise {
+        //Otherwise NOT Send Value
         io.ls1  := 0.U
         io.ls2  := 0.U
     }
 
     //Branch Source Operands
     when (io.opc === (params.Parameters.OP_BRJMP).U) {
+        //Set Branch Reference Value
         io.bs1  := rs1
         io.bs2  := rs2
     }
     .otherwise {
+        //Otherwise NOT Send Value
         io.bs1  := 0.U
         io.bs2  := 0.U
     }
 
-    //Output Immediate
+    //Set Immediate Value
     io.imm      := imm
 }

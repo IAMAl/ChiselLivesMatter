@@ -8,7 +8,6 @@ import chisel3.util._
 import params._
 
 class ISplit_IO extends Bundle {   
-
     val ins     = Input( UInt((params.Parameters.ISAWidth).W))  //Instruction
     val opc     = Output(UInt((params.Parameters.OpcWidth).W))  //Opcode
     val wno     = Output(UInt((params.Parameters.LogNumReg).W)) //Register Destination No

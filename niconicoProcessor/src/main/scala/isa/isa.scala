@@ -12,7 +12,10 @@ import params._
 class ISA_Opcode extends Module {
 
     val io = IO(new Bundle {
+        //Opcode
         val opc         = Input( UInt((params.Parameters.OpcWidth).W))
+
+        //Operation Type
         val OpcodeType  = Output(UInt(3.W))
     })
 

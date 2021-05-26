@@ -10,20 +10,20 @@ import params._
 class ALU extends Module {
 
     val io = IO(new Bundle {
-        val vld     = Input( Bool())
-        val rs1     = Input( UInt((params.Parameters.DatWidth).W))
-        val rs2     = Input( UInt((params.Parameters.DatWidth).W))
-        val fc3     = Input( UInt((params.Parameters.Fc3Width).W))
-        val fc7     = Input( UInt((params.Parameters.Fc7Width).W))
-        val dst     = Output(UInt((params.Parameters.DatWidth).W))
-        val wrb     = Output(Bool())       
-        val UnitID  = Input( UInt(3.W))
+        val vld     = Input( Bool())                                // Exec Validation
+        val rs1     = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-1
+        val rs2     = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-2
+        val fc3     = Input( UInt((params.Parameters.Fc3Width).W))  // Immadiate (Func3)
+        val fc7     = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
+        val dst     = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
+        val wrb     = Output(Bool())                                // Writeback Request
+        val UnitID  = Input( UInt(3.W))                             // Operation Unit ID
     })
 
     //Module
-    val Add     = Module(new Add)
-    val Lgc     = Module(new Lgc)
-    val Sft     = Module(new Sft)
+    val Add     = Module(new Add)       //Adder
+    val Lgc     = Module(new Lgc)       //Logic
+    val Sft     = Module(new Sft)       //Shifter
 
     //Register
     val vld     = RegInit(Bool(), false.B)
@@ -55,6 +55,7 @@ class ALU extends Module {
     vld     := io.vld
     io.wrb  := vld
 
+    //ORed by NOP (Zero-Output when NOP on Operation Unit)
     dst     := Add.io.dst | Lgc.io.dst | Sft.io.dst
     io.dst  := dst
 }

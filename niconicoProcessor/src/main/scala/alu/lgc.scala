@@ -17,15 +17,15 @@ class Lgc extends Module {
     when (io.vld) {
         switch (io.fc3) {
             is(params.Parameters.FC3_XOR.U) {
-                //XOR
+                //Bit-Wise XOR
                 io.dst   := io.rs1 ^ io.rs2
             }
             is(params.Parameters.FC3_OR.U) {
-                //OR
+                //Bit-Wise OR
                 io.dst   := io.rs1 | io.rs2
             }
             is(params.Parameters.FC3_AND.U) {
-                //AND
+                //Bit-Wise AND
                 io.dst   := io.rs1 & io.rs2
             }
         }
