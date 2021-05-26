@@ -13,7 +13,7 @@ class REG extends Module {
     val DataWidth   = params.Parameters.DatWidth
     val NumReg      = params.Parameters.NumReg
 
-     /* I/O                         */
+    /* I/O                          */
     val io = IO(new REG_IO)
 
 
