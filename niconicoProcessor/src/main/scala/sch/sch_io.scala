@@ -7,8 +7,7 @@ import chisel3.util._
 
 import params.Parameters._
 
-class SCH_IO extends Bundle {   
-
+class SCH_IO extends Bundle {
     val vld = Input( Bool())                                //Input Validation
     val ins = Input( UInt((params.Parameters.ISAWidth).W))  //Fetched Instruction Port
 

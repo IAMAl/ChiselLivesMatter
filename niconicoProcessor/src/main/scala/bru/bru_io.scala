@@ -7,8 +7,7 @@ import chisel3.util._
 
 import params._
 
-class BRU_IO extends Bundle { 
-    
+class BRU_IO extends Bundle {
     val vld = Input( Bool())                                    //BRJ Operation Validation
     val rs1 = Input( UInt((params.Parameters.DatWidth).W))      //Source Operand-1 Port
     val rs2 = Input( UInt((params.Parameters.DatWidth).W))      //Source Operand-2 Port

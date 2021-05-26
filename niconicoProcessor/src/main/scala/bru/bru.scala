@@ -11,11 +11,13 @@ import params._
 class BRU extends Module {
 
     val InitPC  = params.Parameters.InitPC
+    val JAL     = params.Parameters.OP_JAL
+    val JALR    = params.Parameters.OP_JALR
 
-    //I/O
+    /* I/O                          */
     val io      = IO(new BRU_IO)
 
-    /* Register                 */
+    /* Register                     */
     //Write-back Flag
     val WRB     = RegInit(Bool(), false.B)
 
@@ -25,7 +27,7 @@ class BRU extends Module {
     //Link Register
     val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC.U)
 
-    /* Wire                     */
+    /* Wire                         */
     //Brach Condition
     val BRC     = Wire(Bool())
 
@@ -39,19 +41,15 @@ class BRU extends Module {
     val imm     = Wire(UInt(21.W))
 
 
-    /* Assign                   */
+    /* Assign                       */
     //Jump-Immediate Composition
     imm     := Cat(io.fc7, io.rn2, io.rn1, io.fc3)
-    when (io.jal === 0.U) {
-        jmp := 0.U
-    }
-    .elsewhen (io.jal === 1.U) {
+    when (io.jal === JAL) {
+        //Jump and Link
         jmp := Cat(imm(20), imm(7, 0), imm(8), imm(19, 9))
-    }  
-    .elsewhen (io.jal === 2.U) {
-        jmp := 0.U
-    } 
-    .elsewhen (io.jal === 3.U) {
+    }
+    .elsewhen (io.jal === JALR) {
+        //Jump and Link Register
         jmp := imm(20, 9).asSInt.asUInt
     }
     .otherwise {
@@ -61,14 +59,13 @@ class BRU extends Module {
     PC_in   := PC.asUInt
     BRC     := DontCare
     when (io.vld) {
-
         //Program Counter and Link
-        when (io.jal === 1.U) {
+        when (io.jal === JAL) {
             //Jump and Link
             PC  := jmp << 1.U
             LNK := PC + 4.U
         }
-        .elsewhen (io.jal === 3.U) {
+        .elsewhen (io.jal === JALR) {
             //Jump and Link Register
             PC  := (io.rs1.asSInt + jmp.asSInt).asUInt
             LNK := PC + 4.U
@@ -111,15 +108,15 @@ class BRU extends Module {
         }
     }
 
-    //Output
-    //
+    /* Output                       */
+    //Branch Condition
     io.brc  := BRC
-    
+
     //Program Counter Value
     io.pc   := PC
 
     //Write-back Request
-    WRB     := ((io.jal === 1.U) || (io.jal === 3.U)) && io.vld
+    WRB     := ((io.jal === JAL) || (io.jal === JALR)) && io.vld
     io.wrb  := WRB
 
     //Link Value

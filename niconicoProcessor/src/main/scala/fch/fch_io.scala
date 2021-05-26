@@ -7,8 +7,7 @@ import chisel3.util._
 
 import params._
 
-class FCH_IO extends Bundle {  
-
+class FCH_IO extends Bundle {
     val boot    = Input( Bool())                                //System Boot Signal
 
     val stall   = Input( Bool())                                //Stall to Fetch

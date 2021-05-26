@@ -43,12 +43,12 @@ object Parameters {
     val OP_RandI    = 0x1   //Register and Immediate
     val OP_RandR    = 0x3   //Register and Register
     val OP_JAL      = 0x3   //Jump and Link
-    val OP_JALR     = 0x1   //
-    
+    val OP_JALR     = 0x1   //Jump and Link Register
+
     //FC-3 Encode
     //Adder
     val FC3_ADD     = 0x0
-    
+
     //Shifter
     val FC3_SR      = 0x5
     val FC3_SL      = 0x1
@@ -78,7 +78,7 @@ object Parameters {
     val FC7_SUB     = 0x20
 
     //Shifter Operation-ID
-    val FC7_LGC     = 0x00 
+    val FC7_LGC     = 0x00
     val FC7_ART     = 0x20
 
     //ALU Sub-Route ID

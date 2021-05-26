@@ -7,47 +7,41 @@ import chisel3._
 import chisel3.util._
 
 import params._
+import lsu._
 
 class FCH extends Module {
 
-    //I/O
+    /* I/O                          */
     val io  = IO(new FCH_IO)
 
-    /* Register                 */
-    //Valid
-    val vld = RegInit(Bool(), false.B)
+    /* Module                       */
+    //Load Request Controller
+    val LdReq   = Module(new LdReq)
 
+    /* Register                     */
     //Execution Enable on Next Pipeline Stage
-    val exe = RegInit(Bool(), false.B)
+    val exe     = RegInit(Bool(), false.B)
 
     //Instruction Register
-    val IR  = RegInit(UInt((params.Parameters.ISAWidth).W), 0.U)
+    val IR      = RegInit(UInt((params.Parameters.ISAWidth).W), 0.U)
 
-    //Assign
+    /* Assign                       */
     //Access Validation
-    when (io.boot ^ io.iack) {
-        vld := true.B
-    }
-    .elsewhen (exe && !io.stall) {
-        vld := false.B
-    }
-    
-    //Nack Generation
-    when (io.brc) {
-        //Flush by Branch-Taken
-        exe := false.B
-    }
-    .elsewhen (vld && !io.stall) {
-        exe := io.iack
-    }
+    LdReq.io.LdReq  := io.boot
+    LdReq.io.LdAck  := io.iack
+    LdReq.io.Stall  := io.stall
+    //LdReq.io.Busy
 
-    //Latch to Instruction Register
-    when (vld && io.iack) {
+    //Valid Followed Pipeline Stage
+    exe := LdReq.io.LdValid && !io.brc && !io.stall
+
+    //Capture Instruction Register
+    when LdReq.io.LdValid) {
         IR  := io.ifch
     }
 
     //Output
     io.ins  := IR
-    io.exe  := exe && !io.stall
-    io.ireq := vld && !io.stall
+    io.exe  := exe
+    io.ireq := LdReq.io.Req
 }

@@ -13,9 +13,11 @@ class REG extends Module {
     val DataWidth   = params.Parameters.DatWidth
     val NumReg      = params.Parameters.NumReg
 
-    //I/O
+     /* I/O                         */
     val io = IO(new REG_IO)
 
+
+    /* Register                     */
     //Register File
     val RF      = RegInit(0.U.asTypeOf(Vec(NumReg, UInt((params.Parameters.DatWidth).W))))
 
@@ -32,7 +34,7 @@ class REG extends Module {
     val fc7     = Reg(UInt((params.Parameters.Fc7Width).W))     //Func7
 
 
-    //Assign
+    /* Assign                       */
     //Immediate's Pre-Formatting
     when (io.opc === (params.Parameters.OP_STORE).U) {      //Store
         imm := Cat(io.fc7, io.wno)
@@ -42,7 +44,7 @@ class REG extends Module {
     }
     .elsewhen (io.opc === (params.Parameters.OP_BRJMP).U) { //Branch/Jump
         imm := Cat(io.fc7(6), io.wno(0), io.fc7(5,0), io.wno(4, 1)) << 1.U
-    }    
+    }
 
     //Write Data
     when (io.wed && io.wrb_r) {
@@ -95,7 +97,7 @@ class REG extends Module {
 
     fc7         := io.fc7   //Func7
     io.fc7_o    := fc7
-    
+
     //Arithmetic Source Operands
     when ((io.opc === (params.Parameters.OP_RandI).U) || (io.opc === (params.Parameters.OP_RandR).U)) {
         //Set Source Operands for

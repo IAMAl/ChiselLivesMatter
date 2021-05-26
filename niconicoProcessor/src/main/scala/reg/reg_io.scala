@@ -7,8 +7,7 @@ import chisel3.util._
 
 import params._
 
-class REG_IO extends Bundle {  
-    
+class REG_IO extends Bundle {
     val vld     = Input( Bool())                                    //Input Validation
     val opc     = Input( UInt((params.Parameters.OpcWidth).W))      //Opcode
 

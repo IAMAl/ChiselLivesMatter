@@ -9,6 +9,7 @@ import params._
 
 class ALU extends Module {
 
+    /* I/O                          */
     val io = IO(new Bundle {
         val vld     = Input( Bool())                                // Exec Validation
         val rs1     = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-1
@@ -20,16 +21,18 @@ class ALU extends Module {
         val UnitID  = Input( UInt(3.W))                             // Operation Unit ID
     })
 
-    //Module
+    /* Module                       */
     val Add     = Module(new Add)       //Adder
     val Lgc     = Module(new Lgc)       //Logic
     val Sft     = Module(new Sft)       //Shifter
 
-    //Register
+
+    /* Register                     */
     val vld     = RegInit(Bool(), false.B)
     val dst     = Reg(UInt((params.Parameters.DatWidth).W))
 
 
+    /* Assign                       */
     //Adder
     Add.io.vld   := (io.UnitID === (params.Parameters.UnitID_Add).U) && io.vld
     Add.io.fc3   := io.fc3

@@ -16,10 +16,11 @@ import lsu._
 
 class NicoNico extends Module {
 
-    //I/O
+    /* I/O                          */
     val io = IO(new NICO2_IO)
 
-    //Module
+
+    /* Module                       */
     val FCH = Module(new FCH)     //Instruction Fetch Unit
     val SCH = Module(new SCH)     //Scheduler
     val REG = Module(new REG)     //Register File
@@ -31,6 +32,7 @@ class NicoNico extends Module {
     val BRU = Module(new BRU)     //Branch Unit
 
 
+  /* Assign                       */
     //Stage-1: Instruction Fetch
     FCH.io.boot := io.boot        //Kick-Start(High-Active)
     FCH.io.ifch := io.inst        //Input 32b Word Instruction

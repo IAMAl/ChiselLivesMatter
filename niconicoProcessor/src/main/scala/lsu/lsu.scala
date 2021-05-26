@@ -14,7 +14,7 @@ import isa._
 
 class LdReq extends Module {
 
-    val io extends Bundle {   
+    val io extends Bundle {
         val LdReq   = Input( Bool())
         val LdAck   = Input( Bool())
         val Stall   = Input( Bool())
@@ -40,7 +40,7 @@ class LdReq extends Module {
             .otherwise {
                 io.Req      := false.B
                 io.LdValid  := false.B
-                FSM         := 0.U                
+                FSM         := 0.U
             }
         }
         is (1.U) {  //In Loading
@@ -57,7 +57,7 @@ class LdReq extends Module {
             .otherwise {
                 io.Req      := true.B
                 io.LdValid  := false.B
-                FSM         := 1.U                
+                FSM         := 1.U
             }
         }
     }

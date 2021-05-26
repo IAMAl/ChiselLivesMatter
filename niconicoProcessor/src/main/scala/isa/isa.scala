@@ -11,6 +11,7 @@ import params._
 
 class ISA_Opcode extends Module {
 
+     /* I/O                          */
     val io = IO(new Bundle {
         //Opcode
         val opc         = Input( UInt((params.Parameters.OpcWidth).W))
@@ -25,6 +26,7 @@ class ISA_Opcode extends Module {
 
 class ISA_fc3_lsu extends Module {
 
+     /* I/O                          */
     val io = IO(new Bundle {
         val fc3     = Input( UInt((params.Parameters.Fc3Width).W))
         val LSType  = Output(UInt((params.Parameters.Fc3Width-1).W))

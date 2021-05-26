@@ -10,10 +10,11 @@ import isa._
 
 class Sft extends Module {
 
-    //I/O
+    /* I/O                          */
     val io = IO(new ALU_IO)
 
-    //Assign
+
+    /* Assign                       */
     when (io.vld) {
         when (io.fc3 === (params.Parameters.FC3_SR).U) {
             when (io.fc7 === (params.Parameters.FC7_ART).U) {

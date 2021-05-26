@@ -10,17 +10,15 @@ import route._
 
 class SCH extends Module {
 
-    //NOTE: In-Order Issue need not WAR Hazard Detection
-
-    //I/O
+     /* I/O                         */
     val io = IO(new SCH_IO)
 
 
-    //Module
+    /* Module                       */
     val ISplit  = Module(new ISplit)
 
 
-    //Register
+    /* Register                     */
     //Value Holder
     val RegVld  = RegInit(false.B.asTypeOf(Vec(4, Bool())))
     val RegOpc  = RegInit(0.U.asTypeOf(UInt((params.Parameters.OpcWidth).W)))
@@ -29,7 +27,6 @@ class SCH extends Module {
     val RegWNo  = RegInit(0.U.asTypeOf(Vec(4, UInt((params.Parameters.LogNumReg).W))))
     val RegRN1  = RegInit(0.U.asTypeOf(Vec(3, UInt((params.Parameters.LogNumReg).W))))
     val RegRN2  = RegInit(0.U.asTypeOf(Vec(3, UInt((params.Parameters.LogNumReg).W))))
-
 
     //Hazard Checker
     val RegLd   = RegInit(false.B.asTypeOf(Vec(3, Bool())))
@@ -41,7 +38,7 @@ class SCH extends Module {
     val CndDst  = RegInit(Bool(), false.B)
 
 
-    //Wire
+    /* Wire                         */
     //Value Holder
     val opc     = Wire(UInt((params.Parameters.OpcWidth).W))
     val wno     = Wire(UInt((params.Parameters.LogNumReg).W))
@@ -55,10 +52,8 @@ class SCH extends Module {
     val WAWDst      = Wire(Vec(4, Bool()))
 
     //Write-After-Read (WAR) Hazard
-    /*
     val WARSr1      = Wire(Vec(3, Bool()))
     val WARSr2      = Wire(Vec(3, Bool()))
-    */
 
     //Read-After-Write (RAW) Hazard
     val RAWSr1      = Wire(Vec(3, Bool()))
@@ -67,10 +62,8 @@ class SCH extends Module {
 
     //Hazard Detector
     val WAW_Hzd     = Wire(Bool())
-    /*
     val WAR_RS1     = Wire(Bool())
     val WAR_RS2     = Wire(Bool())
-    */
     val RAW_Hzd     = Wire(Bool())
 
     //Stall Generation
@@ -83,6 +76,7 @@ class SCH extends Module {
     val imm_LBA     = Wire(Bool())
 
 
+    /* Assign                       */
     //Instruction Split
     ISplit.io.ins   := io.ins
     opc     := ISplit.io.opc
@@ -104,14 +98,14 @@ class SCH extends Module {
     }
 
     //Writing at Store and or Branch
-    imm_SB      := ((opc(6, 4) === (params.Parameters.OP_STORE).U) || 
+    imm_SB      := ((opc(6, 4) === (params.Parameters.OP_STORE).U) ||
                     (opc(6, 4) === (params.Parameters.OP_BRJMP).U))
-    
+
     //Reading at Link, Branch and or ALU
-    imm_LBA     := ((opc(6, 4) === (params.Parameters.OP_JAL).U)   || 
-                    (opc(6, 4) === (params.Parameters.OP_BRJMP).U) || 
+    imm_LBA     := ((opc(6, 4) === (params.Parameters.OP_JAL).U)   ||
+                    (opc(6, 4) === (params.Parameters.OP_BRJMP).U) ||
                     (opc(6, 4) === (params.Parameters.OP_RandI).U))
-    
+
     //Register Read Stage
     RegVld(0)   := io.vld && !Stall
     when (io.vld) {
@@ -120,7 +114,7 @@ class SCH extends Module {
         RegRN1(0)   := rn1
         RegRN2(0)   := rn2
         RegWNo(0)   := wno
-        RegCnd(0)   := (opc(6, 4) === (params.Parameters.OP_JAL).U)  || 
+        RegCnd(0)   := (opc(6, 4) === (params.Parameters.OP_JAL).U)  ||
                        (opc(6, 4) === (params.Parameters.OP_BRJMP).U)
         RegLd(0)    := (opc(6, 4) === (params.Parameters.OP_LOAD).U)
     }
@@ -157,7 +151,7 @@ class SCH extends Module {
     .otherwise {
         RegWNo(3)   := 0.U
     }
-    
+
 
     /* Hazard Detection         */
     //Write-After-Write
@@ -167,7 +161,6 @@ class SCH extends Module {
     WAWDst(3)   := (RegWNo(3) === RegWNo(0)) && RegVld(3)
 
     //Write-After-Read
-    /*
     WARSr1(0)   := (RegRN1(0) === io.wno)
     WARSr1(1)   := (RegRN1(1) === RegWNo(0))
     WARSr1(2)   := (RegRN1(2) === RegWNo(0))
@@ -175,7 +168,6 @@ class SCH extends Module {
     WARSr2(0)   := (RegRN2(0) === io.wno)
     WARSr2(1)   := (RegRN2(1) === RegWNo(0))
     WARSr2(2)   := (RegRN2(2) === RegWNo(0))
-    */
 
     //Structural Hazard Detection
     RAWSr1(0)   := (RegRN1(0) === RegWNo(2)) && RegVld(0)
@@ -192,21 +184,18 @@ class SCH extends Module {
 
     /* Stall Detection          */
     //Write-After-Write Hazard Detection
-    //WAW between preceding load and follower destinations 
+    //WAW between preceding load and follower destinations
     WAW_Hzd     := (WAWDst.asUInt =/= 0.U)
 
     //Write-After-Read Hazard Detection
-    //In-Order Execution needs not take care of WAR
-    /*
     WAR_RS1     := (WARSr1.asUInt =/= 0.U)
     WAR_RS2     := (WARSr2.asUInt =/= 0.U)
-    */
 
     //Read-After-Write Hazard Detection
     RAW_Hzd     := (RAWSr1.asUInt =/= 0.U) || (RAWSr2.asUInt =/= 0.U) || RAWMem
 
     //Register-Write Stall
-    StallWrite  := /*WAR_RS1 || WAR_RS2 ||*/ WAW_Hzd
+    StallWrite  := WAR_RS1 || WAR_RS2 || WAW_Hzd
 
     //Register-Read Stall
     StallRead   := RAW_Hzd

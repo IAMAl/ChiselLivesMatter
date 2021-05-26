@@ -7,8 +7,7 @@ import chisel3.util._
 
 import params._
 
-class LSU_IO extends Bundle {   
-    
+class LSU_IO extends Bundle {
     val vld = Input( Bool())                                    //Activate Operation
     val opc = Input( UInt((params.Parameters.OpcWidth).W))      //Opcode
     val fc3 = Input( UInt((params.Parameters.Fc3Width).W))      //Function-3

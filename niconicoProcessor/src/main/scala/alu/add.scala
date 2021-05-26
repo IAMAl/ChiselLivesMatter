@@ -10,14 +10,14 @@ import isa._
 
 class Add extends Module {
 
-    //I/O
+    /* I/O                          */
     val io = IO(new ALU_IO)
 
-    //Wire
+    /* Wire                         */
     val rs2     = Wire(UInt((params.Parameters.DatWidth).W))
     val c_in    = Wire(UInt(1.W))
 
-    //Assign
+    /* Assign                       */
     //Selection of Right-Source Operand
     when (io.fc7 === (params.Parameters.FC7_SUB).U) {
         //1's Complement for Subtraction
