@@ -10,7 +10,7 @@ import route._
 
 class SCH extends Module {
 
-     /* I/O                         */
+    /* I/O                          */
     val io = IO(new SCH_IO)
 
 
