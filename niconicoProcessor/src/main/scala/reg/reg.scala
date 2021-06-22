@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-//Register File Unit
+// Register File Unit
 package reg
 
 import chisel3._

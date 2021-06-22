@@ -32,7 +32,7 @@ class NicoNico extends Module {
     val BRU = Module(new BRU)     //Branch Unit
 
 
-  /* Assign                       */
+    /* Assign                       */
     //Stage-1: Instruction Fetch
     FCH.io.boot := io.boot        //Kick-Start(High-Active)
     FCH.io.ifch := io.inst        //Input 32b Word Instruction

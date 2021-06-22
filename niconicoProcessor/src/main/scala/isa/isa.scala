@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-//RISC-V Instruction Set Architecture (ISA) Definision
+// RISC-V Instruction Set Architecture (ISA) Definision
 package isa
 
 import chisel3._

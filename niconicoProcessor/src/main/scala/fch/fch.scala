@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-//Instruction Fetch Unit
+// Instruction Fetch Unit
 package fch
 
 import chisel3._

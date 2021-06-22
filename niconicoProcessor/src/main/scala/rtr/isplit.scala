@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-//Instruction Decoder
+// Instruction Decoder
 package route
 
 import chisel3._

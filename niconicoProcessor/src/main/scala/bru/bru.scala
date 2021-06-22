@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-//Branch Unit
+// Branch Unit
 package bru
 
 import chisel3._

@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-//Load/Store Unit
+// Load/Store Unit
 package lsu
 
 import scala.math.BigInt
