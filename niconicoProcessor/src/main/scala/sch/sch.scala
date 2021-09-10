@@ -40,12 +40,12 @@ class SCH extends Module {
 
     /* Wire                         */
     //Value Holder
-    val opc     = Wire(UInt((params.Parameters.OpcWidth).W))
-    val wno     = Wire(UInt((params.Parameters.LogNumReg).W))
-    val rn1     = Wire(UInt((params.Parameters.LogNumReg).W))
-    val rn2     = Wire(UInt((params.Parameters.LogNumReg).W))
-    val fc3     = Wire(UInt((params.Parameters.Fc3Width).W))
-    val fc7     = Wire(UInt((params.Parameters.Fc7Width).W))
+    val opc         = Wire(UInt((params.Parameters.OpcWidth).W))
+    val wno         = Wire(UInt((params.Parameters.LogNumReg).W))
+    val rn1         = Wire(UInt((params.Parameters.LogNumReg).W))
+    val rn2         = Wire(UInt((params.Parameters.LogNumReg).W))
+    val fc3         = Wire(UInt((params.Parameters.Fc3Width).W))
+    val fc7         = Wire(UInt((params.Parameters.Fc7Width).W))
 
     //Hazard Checker
     //Write-After-Write (WAW) Hazard
@@ -78,13 +78,13 @@ class SCH extends Module {
 
     /* Assign                       */
     //Instruction Split
-    ISplit.io.ins   := io.ins
-    opc     := ISplit.io.opc
-    fc3     := ISplit.io.fc3
-    fc7     := ISplit.io.fc7
-    wno     := ISplit.io.wno
-    rn1     := ISplit.io.rn1
-    rn2     := ISplit.io.rn2
+    ISplit.io.i_ins := io.i_ins
+    opc     := ISplit.io.o_opc
+    fc3     := ISplit.io.o_fc3
+    fc7     := ISplit.io.o_fc7
+    wno     := ISplit.io.o_wno
+    rn1     := ISplit.io.o_rn1
+    rn2     := ISplit.io.o_rn2
 
 
     //Jump and Link (JAL) Handler
@@ -107,8 +107,8 @@ class SCH extends Module {
                     (opc(6, 4) === (params.Parameters.OP_RandI).U))
 
     //Register Read Stage
-    RegVld(0)   := io.vld && !Stall
-    when (io.vld) {
+    RegVld(0)   := io.i_vld && !Stall
+    when (io.i_vld) {
         ImmDst(0)   := imm_SB
         ImmSrc(0)   := imm_LBA
         RegRN1(0)   := rn1
@@ -155,17 +155,17 @@ class SCH extends Module {
 
     /* Hazard Detection         */
     //Write-After-Write
-    WAWDst(0)   := (RegWNo(0) === io.wno)    && RegVld(0) && !ImmDst(0)
+    WAWDst(0)   := (RegWNo(0) === io.i_wno)  && RegVld(0) && !ImmDst(0)
     WAWDst(1)   := (RegWNo(1) === RegWNo(0)) && RegVld(1) && !ImmDst(1)
     WAWDst(2)   := (RegWNo(2) === RegWNo(0)) && RegVld(2) && !ImmDst(2)
     WAWDst(3)   := (RegWNo(3) === RegWNo(0)) && RegVld(3)
 
     //Write-After-Read
-    WARSr1(0)   := (RegRN1(0) === io.wno)
+    WARSr1(0)   := (RegRN1(0) === io.i_wno)
     WARSr1(1)   := (RegRN1(1) === RegWNo(0))
     WARSr1(2)   := (RegRN1(2) === RegWNo(0))
 
-    WARSr2(0)   := (RegRN2(0) === io.wno)
+    WARSr2(0)   := (RegRN2(0) === io.i_wno)
     WARSr2(1)   := (RegRN2(1) === RegWNo(0))
     WARSr2(2)   := (RegRN2(2) === RegWNo(0))
 
@@ -208,30 +208,30 @@ class SCH extends Module {
 
 
     //Output
-    when (io.vld && !Stall) {
+    when (io.i_vld && !Stall) {
         RegOpc  := opc
         RegFc3  := fc3
         RegFc7  := fc7
     }
 
-    io.opc  := RegOpc
-    io.rn1  := RegRN1(0)
-    io.rn2  := RegRN2(0)
-    io.wno  := RegWNo(0)
-    io.fc3  := RegFc3
-    io.fc7  := RegFc7
+    io.o_opc    := RegOpc
+    io.o_rn1    := RegRN1(0)
+    io.o_rn2    := RegRN2(0)
+    io.o_wno    := RegWNo(0)
+    io.o_fc3    := RegFc3
+    io.o_fc7    := RegFc7
 
-    io.wed  := !StallWrite
-    io.re1  := !StallRead && !StallBranch && RegVld(0)
-    io.re2  := !StallRead && !StallBranch && RegVld(0)
+    io.o_wed    := !StallWrite
+    io.o_re1    := !StallRead && !StallBranch && RegVld(0)
+    io.o_re2    := !StallRead && !StallBranch && RegVld(0)
 
     //Bypassing from Write-Back Stage to Exe Stage
-    io.by1  := RAWSr1(1)
-    io.by2  := RAWSr2(1)
+    io.o_by1    := RAWSr1(1)
+    io.o_by2    := RAWSr2(1)
 
     //Validate Next Stage
-    io.exe  := RegVld(0)
+    io.o_exe    := RegVld(0)
 
     //Active-flag for Branch Unit
-    io.cnd  := (RegCnd.asUInt =/= 0.U)
+    io.o_cnd    := (RegCnd.asUInt =/= 0.U)
 }

@@ -21,7 +21,7 @@ class LdReq extends Module {
         val Req     = Output(Bool())
         val LdValid = Output(Bool())
         val Busy    = Output(Bool())
-    })
+    }
 
     //Register
     val FSM     = RegInit(UInt(1.W), 0.U)
@@ -62,6 +62,7 @@ class LdReq extends Module {
         }
     }
 }
+
 
 class LSU extends Module {
 
@@ -143,52 +144,51 @@ class LSU extends Module {
         mdr := io.rs2 & msk.asUInt
     }
     .elsewhen (LdReq.io.io.LdValid) {
-            //Load
-            mdr := dat
-        }
+        //Load
+        mdr := dat
     }
 
     //Output
     when (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_BYTE).U) {
         //1-Byte Access
-        io.csel(0) := 1.U
-        io.csel(1) := 0.U
-        io.csel(2) := 0.U
-        io.csel(3) := 0.U
+        io.o_csel(0)    := 1.U
+        io.o_csel(1)    := 0.U
+        io.o_csel(2)    := 0.U
+        io.o_csel(3)    := 0.U
 
         msk := 0x000000FF.S
     }
     .elsewhen (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_HWORD).U) {
         //2-Byte Access
-        io.csel(0) := 1.U
-        io.csel(1) := 1.U
-        io.csel(2) := 0.U
-        io.csel(3) := 0.U
+        io.o_csel(0)    := 1.U
+        io.o_csel(1)    := 1.U
+        io.o_csel(2)    := 0.U
+        io.o_csel(3)    := 0.U
 
         msk := 0x0000FFFF.S
     }
     .elsewhen (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_WORD).U) {
         //4-Byte Access
-        io.csel(0) := 1.U
-        io.csel(1) := 1.U
-        io.csel(2) := 1.U
-        io.csel(3) := 1.U
+        io.o_csel(0)    := 1.U
+        io.o_csel(1)    := 1.U
+        io.o_csel(2)    := 1.U
+        io.o_csel(3)    := 1.U
 
         msk := 0xFFFFFFFF.S
     }
     .otherwise {
         //Disable to Access
-        io.csel(0) := 0.U
-        io.csel(1) := 0.U
-        io.csel(2) := 0.U
-        io.csel(3) := 0.U
+        io.o_csel(0)    := 0.U
+        io.o_csel(1)    := 0.U
+        io.o_csel(2)    := 0.U
+        io.o_csel(3)    := 0.U
 
         msk := 0x00000000.S
     }
-    io.dreq  := LdReq.io.Req
-    io.stor  := is_St
-    io.dmar  := mar
-    io.dst   := mdr
-    io.odat  := mdr
-    io.wrb   := LdDone
+    io.o_dreq   := LdReq.io.Req
+    io.o_stor   := is_St
+    io.o_dmar   := mar
+    io.o_dst    := mdr
+    io.o_odat   := mdr
+    io.o_wrb    := LdDone
 }

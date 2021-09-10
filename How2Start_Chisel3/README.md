@@ -1,5 +1,5 @@
 # Introduction to Chisel for Biginners
-Chisel3 for Beginners; How to start hardware description language
+Chisel3 for Beginners; How to begin coding with hardware description language
 
 ## Target People for This Document
 Beginners who have not experience about Chisel and Scala programming languages. Almost hardware engineers are categorized in this type.
@@ -13,13 +13,7 @@ Prerequisites to run are;
 - Java Runtime Environment (or JDK for running Scala)
 - SBT (Simple Built Tool, to compile chisel code)
 
-## Installations
-
-**NOTE**: Before installation, you need to check you are one of which user types;
-  - **Ordinary** user (let us say simply *user*) who wants to compile their chisel code to generate HDL, so they want to use chisel as a common tool, they should use **released** chisel. 
-  - **Deveropper** user (let us call a *developer*) who needs advanced tool which is not yet released (ex. they might want **rc** version), and or want to costomize the tools for their purpose. They might want **pre-released** chisel.
-
-### Common Installations for Users
+### Prerequisites: Common Installations for Users
 
 - Java Runtime Environment (JRE)
   
@@ -35,6 +29,12 @@ Prerequisites to run are;
   Installation instruction is well descrived in this web-page;
   https://github.com/freechipsproject/chisel3/wiki/Installation-Preparation  
   SBT's dependency calls openJDK at its installation, even if you have installed Oracle's Java at default setting.
+
+## Installations
+
+**NOTE**: Before installation, you need to check you are one of which user types;
+  - **Ordinary** user (let us say simply *user*) who wants to compile their chisel code to generate HDL, so they want to use chisel as a common tool, they should use **released** chisel. 
+  - **Deveropper** user (let us call a *developer*) who needs advanced tool which is not yet released (ex. they might want **rc** version), and or want to costomize the tools for their purpose. They might want **pre-released** chisel.
 
 
 ### Installation for Ordinary Users
@@ -109,11 +109,11 @@ root--+--build.sbt
               +--test--+--scala--"YOUR_TEST_CODES.scala"
 
 ```
-This is **strict constraint** by SBT, all chisel codes should belong to this directory structure. If you do not take this directory structure, you will meet **ClassNotFound** error, SBT could not find root file.
+This is **strict constraint** by SBT, all chisel codes should belong to this directory structure. If you do not take this directory structure, you will meet **ClassNotFound** error, SBT could not find a root directory.
 
 ## Compilation
 
-At the compilation, SBT checks directory structure, and so, you do not need to specify which file(s) should be compiled. SBT traces a  *class-dependency* from top-class as a root. This means that you need to specify *root class*.
+At the compilation, SBT checks directory structure, and so, you do not need to specify which file(s) should be compiled. SBT traces a  *class-dependency* from top-class as a root. This means that you need to specify a *root class*.
 
 ### Before Your Compilation
 
@@ -265,11 +265,11 @@ Class ```datum``` has to two primitives; ```valid``` (bool type) and ```data``` 
 ```
   val Datum = RegInit(0.U.asTypeOf(new datum(DataWidth)))
 ```
-  Both of valid and data "reg with init var"s in RTL is *zero cleared* (unsigned zero) by hardware "reset" signal. You can specify your preferred value. The reset (and also clock) is added automatically to the HDL.
+  Both of valid and data "reg with init var"s in RTL is *zero cleared* (unsigned zero) by hardware "reset" signal. You can specify your preferred initial value. The reset (and also clock) is added automatically to the HDL.
 
 - **Multi-Primitive**  
   You might want to have multiple instances of a class. ```Vec``` method help us to coding without redundant efforts.
-  For example, ```Port()``` which defines I/O bundling several I/Os, we can define Num Ports as "port" like this;
+  For example, ```Port()``` which defines I/O bundling several I/Os, we can define Num Ports as a "port" like this;
 ```
   val io = IO(new Bundle {val port = Vec(Num, new Port(Width))})
 ```
@@ -298,7 +298,7 @@ Class ```datum``` has to two primitives; ```valid``` (bool type) and ```data``` 
 
   **Meaning**: SBT (and thus Java Virtual Machine; JVM) needs more heap memory space in Java.
 
-  **Solution**: To Specify giving space, sett this in terminal shell setting (bash: .bashrc);
+  **Solution**: To Specify giving space, set berrow in terminal shell setting (bash: .bashrc);
 ```
   export _JAVA_OPTIONS=-Xmx2048m
 ```
@@ -319,4 +319,12 @@ Class ```datum``` has to two primitives; ```valid``` (bool type) and ```data``` 
 ```
   Port/Wire := DontCare
 ```  
-**NOTE**: the ```DontCare``` works every where. If you use this assignment for other purpose then you will meet failed HDL generation.
+**NOTE**: the ```DontCare``` works every where. If you use this assignment for other purpose then you can meet failed HDL generation.
+
+## FIRRTL
+To generate Verilog-File through firrtl, you can do it with;
+```
+firrtl -i InputFileName.fir -o OutputFileName.v -X verilog
+```
+```-i``` and ```-o``` options specify input and output files, respectively.
+While this example inputs fir file, protobuf (*.pb) file also can be fed.

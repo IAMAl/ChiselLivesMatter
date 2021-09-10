@@ -36,106 +36,106 @@ class REG extends Module {
 
     /* Assign                       */
     //Immediate's Pre-Formatting
-    when (io.opc === (params.Parameters.OP_STORE).U) {      //Store
-        imm := Cat(io.fc7, io.wno)
+    when (io.i_opc === (params.Parameters.OP_STORE).U) {      //Store
+        imm := Cat(io.i_fc7, io.i_wno)
     }
-    .elsewhen (io.opc === (params.Parameters.OP_LOAD).U) {  //Load
-        imm := Cat(io.fc7, io.rn2)
+    .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {  //Load
+        imm := Cat(io.i_fc7, io.i_rn2)
     }
-    .elsewhen (io.opc === (params.Parameters.OP_BRJMP).U) { //Branch/Jump
-        imm := Cat(io.fc7(6), io.wno(0), io.fc7(5,0), io.wno(4, 1)) << 1.U
+    .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) { //Branch/Jump
+        imm := Cat(io.i_fc7(6), io.i_wno(0), io.i_fc7(5,0), io.i_wno(4, 1)) << 1.U
     }
 
     //Write Data
-    when (io.wed && io.wrb_r) {
-        RF(io.wno)  := io.wrb_d
+    when (io.i_wed && io.i_wrb_r) {
+        RF(io.i_wno)    := io.i_wrb_d
     }
 
     //Read Source-1
-    when (io.vld) {
-        when (io.re1 && io.by1) {
+    when (io.i_vld) {
+        when (io.i_re1 && io.i_by1) {
             //Bypass
-            rs1 := io.wrb_d
+            rs1 := io.i_wrb_d
         }
-        .elsewhen (io.re1) {
+        .elsewhen (io.i_re1) {
             //Read Register File
-            rs1 := RF(io.rn1)
+            rs1 := RF(io.i_rn1)
         }
     }
 
     //Read Source-2
-    when (io.vld) {
-        when (io.re2 && io.by2) {
+    when (io.i_vld) {
+        when (io.i_re2 && io.i_by2) {
             //Bypass
-            rs2 := io.wrb_d
+            rs2 := io.i_wrb_d
         }
-        .elsewhen (io.re2) {
+        .elsewhen (io.i_re2) {
             //Read Register File
-            rs2 := RF(io.rn2)
+            rs2 := RF(io.i_rn2)
         }
         .otherwise {
             //Output Immediate
-            rs2 := io.fc7
+            rs2 := io.i_fc7
         }
     }
 
     //Output to Follower Pipeline Stage
-    exe         := io.vld   //Exec Validation
-    io.exe      := exe
+    exe         := io.i_vld //Exec Validation
+    io.o_exe    := exe
 
-    opcode      := io.opc   //Send Opcode
-    io.opcode   := opcode
+    opcode      := io.i_opc //Send Opcode
+    io.o_opcode := opcode
 
-    rn1         := io.rn1   //RegisterFile No for Source-1
-    io.rn1_o    := rn1
+    rn1         := io.i_rn1 //RegisterFile No for Source-1
+    io.o_rn1_o  := rn1
 
-    rn2         := io.rn2   //RegisterFile No for Source-2
-    io.rn2_o    := rn2
+    rn2         := io.i_rn2 //RegisterFile No for Source-2
+    io.o_rn2_o  := rn2
 
-    fc3         := io.fc3   //Func3
-    io.fc3_o    := fc3
+    fc3         := io.i_fc3 //Func3
+    io.o_fc3_o  := fc3
 
-    fc7         := io.fc7   //Func7
-    io.fc7_o    := fc7
+    fc7         := io.i_fc7 //Func7
+    io.o_fc7_o  := fc7
 
     //Arithmetic Source Operands
-    when ((io.opc === (params.Parameters.OP_RandI).U) || (io.opc === (params.Parameters.OP_RandR).U)) {
+    when ((io.i_opc === (params.Parameters.OP_RandI).U) || (io.i_opc === (params.Parameters.OP_RandR).U)) {
         //Set Source Operands for
         // Source-1&2 are from RegisterFile
         // SOurce-1 is from RegisterFile
-        io.as1  := rs1
-        io.as2  := rs2
+        io.o_as1    := rs1
+        io.o_as2    := rs2
     }
     .otherwise {
         //Otherwise NOT Send Value
-        io.as1  := 0.U
-        io.as2  := 0.U
+        io.o_as1    := 0.U
+        io.o_as2    := 0.U
     }
 
     //Load/Store Source Operands
-    when ((io.opc === (params.Parameters.OP_STORE).U) || (io.opc === (params.Parameters.OP_LOAD).U)) {
+    when ((io.i_opc === (params.Parameters.OP_STORE).U) || (io.o_opc === (params.Parameters.OP_LOAD).U)) {
         //Set Load/Store Reference Data
-        io.ls1  := rs1
-        io.ls2  := rs2
+        io.o_ls1    := rs1
+        io.o_ls2    := rs2
     }
     .otherwise {
         //Otherwise NOT Send Value
-        io.ls1  := 0.U
-        io.ls2  := 0.U
+        io.o_ls1    := 0.U
+        io.o_ls2    := 0.U
     }
 
     //Branch Source Operands
-    when (io.opc === (params.Parameters.OP_BRJMP).U) {
+    when (io.i_opc === (params.Parameters.OP_BRJMP).U) {
         //Set Branch Reference Value
-        io.bs1  := rs1
-        io.bs2  := rs2
+        io.o_bs1    := rs1
+        io.o_bs2    := rs2
     }
     .otherwise {
         //Otherwise NOT Send Value
-        io.bs1  := 0.U
-        io.bs2  := 0.U
+        io.o_bs1    := 0.U
+        io.o_bs2    := 0.U
     }
 
     //Set Immediate Value
-    io.imm      := imm
+    io.o_imm    := imm
 }

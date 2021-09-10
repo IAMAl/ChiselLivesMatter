@@ -12,12 +12,12 @@ class URT extends Module {
 
     /* I/O                          */
     val io = IO(new Bundle {
-        val opc     = Input( UInt((params.Parameters.OpcWidth).W))
-        val UnitID  = Output(UInt(3.W))
-        val EnWB    = Output(Bool())
-        val is_ALU  = Output(Bool())
-        val is_LSU  = Output(Bool())
-        val is_BRU  = Output(Bool())
+        val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
+        val o_UnitID    = Output(UInt(3.W))
+        val o_EnWB      = Output(Bool())
+        val o_is_ALU    = Output(Bool())
+        val o_is_LSU    = Output(Bool())
+        val o_is_BRU    = Output(Bool())
     })
 
     /* Module                       */
@@ -35,7 +35,7 @@ class URT extends Module {
 
     /* Assign                       */
     //Routing (UnitID) Assignment and Write-Back Enable
-    ISA_Opcode.io.opc   := io.opc
+    ISA_Opcode.io.i_opc := io.i_opc
     UnitID              := ISA_Opcode.io.OpcodeType
 
     //Write-Back Enable Assertion
@@ -51,15 +51,15 @@ class URT extends Module {
     }
 
     //Output
-    io.UnitID   := UnitID
-    io.EnWB     := EnWB
+    io.o_UnitID := UnitID
+    io.o_EnWB   := EnWB
 
     is_ALU      := (UnitID === (params.Parameters.OP_RandI).U) || (UnitID === (params.Parameters.OP_RandR).U)
-    io.is_ALU   := is_ALU
+    io.o_is_ALU := is_ALU
 
     is_LSU      := (UnitID === (params.Parameters.OP_LOAD).U)  || (UnitID === (params.Parameters.OP_STORE).U)
-    io.is_LSU   := is_LSU
+    io.o_is_LSU := is_LSU
 
     is_BRU      := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U)
-    io.is_BRU   := is_BRU
+    io.o_is_BRU := is_BRU
 }
