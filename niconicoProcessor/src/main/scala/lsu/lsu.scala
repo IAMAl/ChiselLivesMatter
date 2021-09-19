@@ -14,14 +14,10 @@ import isa._
 
 class LdReq extends Module {
 
-    val io extends Bundle {
-        val LdReq   = Input( Bool())
-        val LdAck   = Input( Bool())
-        val Stall   = Input( Bool())
-        val Req     = Output(Bool())
-        val LdValid = Output(Bool())
-        val Busy    = Output(Bool())
-    }
+
+    /* I/O                          */
+    val io = IO(new Load_IO)
+
 
     //Register
     val FSM     = RegInit(UInt(1.W), 0.U)
@@ -30,7 +26,7 @@ class LdReq extends Module {
 
     io.LdValid  := DontCare
     io.Req      := DontCare
-    when (FSM) {
+    switch (FSM) {
         is (0.U) {  //Init
             when (io.LdReq && !io.Stall) {
                 io.Req      := true.B
@@ -86,28 +82,28 @@ class LSU extends Module {
 
     /* Assign                       */
     //Func3 Decode
-    ISA_fc3_lsu.io.fc3  := io.fc3
+    ISA_fc3_lsu.io.i_fc3  := io.i_fc3
 
     //Load-Data Word Formatter
-    when(io.fc3 === (params.Parameters.FC3_BYTEU).U) {
+    when(io.i_fc3 === (params.Parameters.FC3_BYTEU).U) {
         //1-Byte Word with Sign-Extension
-        dat := io.idat( 7, 0).asSInt.asUInt
+        dat := io.i_idat( 7, 0).asSInt.asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORDU).U) {
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_HWORDU).U) {
         //2-Byte Word with Sign-Extension
-        dat := io.idat(15, 0).asSInt.asUInt
+        dat := io.i_idat(15, 0).asSInt.asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_BYTE).U) {
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_BYTE).U) {
         //1-Byte Word
-        dat := io.idat( 7, 0).asUInt
+        dat := io.i_idat( 7, 0).asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORD).U) {
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_HWORD).U) {
         //2-Byte Word
-        dat := io.idat(15, 0).asUInt
+        dat := io.i_idat(15, 0).asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_WORD).U) {
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_WORD).U) {
         //4-Byte Word
-        dat := io.idat.asUInt
+        dat := io.i_idat.asUInt
     }
     .otherwise {
         //NOP
@@ -116,40 +112,40 @@ class LSU extends Module {
 
     //MAR & MDR Porting
     //Check Instruction is Load or not
-    is_Ld   := io.vld && (io.opc === (params.Parameters.OP_LOAD).U)
+    is_Ld   := io.i_vld && (io.i_opc === (params.Parameters.OP_LOAD).U)
 
     //Check Instruction is Store or not
-    is_St   := io.vld && (io.opc === (params.Parameters.OP_STORE).U)
+    is_St   := io.i_vld && (io.i_opc === (params.Parameters.OP_STORE).U)
 
     //Loading Path
-    when (!io.vld && !LdReq.io.Busy) {
+    when (!io.i_vld && !LdReq.io.Busy) {
         LdDone  := false.B
     }
-    .elsewhen (LdReq.io.io.LdValid) {
+    .elsewhen (LdReq.io.LdValid) {
         LdDone  := true.B
     }
     LdReq.io.Stall  := false.B  //ToDo
     LdReq.io.LdReq  := is_Ld
-    LdReq.io.LdAck  := io.dack
+    LdReq.io.LdAck  := io.i_dack
 
     //Set Memory Address Register
-    when (io.vld) {
-        mar := io.rs1 + io.imm
+    when (io.i_vld) {
+        mar := io.i_rs1 + io.i_imm
     }
 
     //Set Memory Data Register
     when (is_St) {
         //Store
         //Mask is used for Byte, and Half-Word Accesses
-        mdr := io.rs2 & msk.asUInt
+        mdr := io.i_rs2 & msk.asUInt
     }
-    .elsewhen (LdReq.io.io.LdValid) {
+    .elsewhen (LdReq.io.LdValid) {
         //Load
         mdr := dat
     }
 
     //Output
-    when (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_BYTE).U) {
+    when (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_BYTE).U) {
         //1-Byte Access
         io.o_csel(0)    := 1.U
         io.o_csel(1)    := 0.U
@@ -158,7 +154,7 @@ class LSU extends Module {
 
         msk := 0x000000FF.S
     }
-    .elsewhen (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_HWORD).U) {
+    .elsewhen (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_HWORD).U) {
         //2-Byte Access
         io.o_csel(0)    := 1.U
         io.o_csel(1)    := 1.U
@@ -167,7 +163,7 @@ class LSU extends Module {
 
         msk := 0x0000FFFF.S
     }
-    .elsewhen (ISA_fc3_lsu.io.LSType ===  (params.Parameters.FC3_WORD).U) {
+    .elsewhen (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_WORD).U) {
         //4-Byte Access
         io.o_csel(0)    := 1.U
         io.o_csel(1)    := 1.U

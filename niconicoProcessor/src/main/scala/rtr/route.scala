@@ -36,7 +36,7 @@ class URT extends Module {
     /* Assign                       */
     //Routing (UnitID) Assignment and Write-Back Enable
     ISA_Opcode.io.i_opc := io.i_opc
-    UnitID              := ISA_Opcode.io.OpcodeType
+    UnitID              := ISA_Opcode.io.o_OpcodeType
 
     //Write-Back Enable Assertion
     when (  (UnitID === (params.Parameters.OP_RandI).U) || 

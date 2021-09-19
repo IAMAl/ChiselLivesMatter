@@ -34,82 +34,82 @@ class NicoNico extends Module {
 
     /* Assign                       */
     //Stage-1: Instruction Fetch
-    FCH.io.boot := io.boot        //Kick-Start(High-Active)
-    FCH.io.ifch := io.inst        //Input 32b Word Instruction
-    FCH.io.brc  := BRU.io.brc     //Flush by Branch Taken
-    FCH.io.stall:= SCH.io.cnd     //Branch Unit is Active (so stall)
+    FCH.io.i_boot := io.boot        //Kick-Start(High-Active)
+    FCH.io.i_ifch := io.inst        //Input 32b Word Instruction
+    FCH.io.i_brc  := BRU.io.o_brc     //Flush by Branch Taken
+    FCH.io.i_stall:= SCH.io.o_cnd     //Branch Unit is Active (so stall)
 
 
     //Stage-2: Scheduler
-    SCH.io.vld  := FCH.io.exe     //Validate Scheduler
-    SCH.io.ins  := FCH.io.ins     //Feed Instruction Word
+    SCH.io.i_vld  := FCH.io.o_exe     //Validate Scheduler
+    SCH.io.i_ins  := FCH.io.o_ins     //Feed Instruction Word
 
 
     //Stage-3: Register-Read
-    REG.io.vld  := SCH.io.exe     //Validate Register File
-    REG.io.opc  := SCH.io.opc     //Opcode
-    REG.io.by1  := SCH.io.by1     //Bypassing Data Word-1
-    REG.io.by2  := SCH.io.by2     //Bypassing Data Word-2
-    REG.io.re1  := SCH.io.re1     //Read Enable-1
-    REG.io.re2  := SCH.io.re2     //Read Enable-2
-    REG.io.rn1  := SCH.io.rn1     //Read Register Number-1
-    REG.io.rn2  := SCH.io.rn2     //Read Register Number-2
-    REG.io.fc3  := SCH.io.fc3     //Func3 Value
-    REG.io.fc7  := SCH.io.fc7     //Func7 Value
-    REG.io.wno  := SCH.io.wno     //Write Register Number
+    REG.io.i_vld  := SCH.io.o_exe     //Validate Register File
+    REG.io.i_opc  := SCH.io.o_opc     //Opcode
+    REG.io.i_by1  := SCH.io.o_by1     //Bypassing Data Word-1
+    REG.io.i_by2  := SCH.io.o_by2     //Bypassing Data Word-2
+    REG.io.i_re1  := SCH.io.o_re1     //Read Enable-1
+    REG.io.i_re2  := SCH.io.o_re2     //Read Enable-2
+    REG.io.i_rn1  := SCH.io.o_rn1     //Read Register Number-1
+    REG.io.i_rn2  := SCH.io.o_rn2     //Read Register Number-2
+    REG.io.i_fc3  := SCH.io.o_fc3     //Func3 Value
+    REG.io.i_fc7  := SCH.io.o_fc7     //Func7 Value
+    REG.io.i_wno  := SCH.io.o_wno     //Write Register Number
 
     //Stage-3: Route to Exec Units
-    URT.io.opc  := SCH.io.opc     //Routing by Opcode
+    URT.io.i_opc  := SCH.io.o_opc     //Routing by Opcode
 
 
     //Stage-4: Arithmetic/Logic Unit
-    ALU.io.UnitID := URT.io.UnitID//Executing Datapath ID
-    ALU.io.vld  := REG.io.exe && URT.io.is_ALU  //Validate ALU
-    ALU.io.fc3  := REG.io.fc3_o   //Func3 Value
-    ALU.io.fc7  := REG.io.fc7_o   //Func7 Value
-    ALU.io.rs1  := REG.io.as1     //Operand Data Word-1
-    ALU.io.rs2  := REG.io.as2     //Operand Data Word-2
+    ALU.io.i_UnitID := URT.io.o_UnitID//Executing Datapath ID
+    ALU.io.i_vld  := REG.io.o_exe && URT.io.o_is_ALU  //Validate ALU
+    ALU.io.i_fc3  := REG.io.o_fc3_o   //Func3 Value
+    ALU.io.i_fc7  := REG.io.o_fc7_o   //Func7 Value
+    ALU.io.i_rs1  := REG.io.o_as1     //Operand Data Word-1
+    ALU.io.i_rs2  := REG.io.o_as2     //Operand Data Word-2
 
     //Stage-4: Load/Store Unit
-    LSU.io.vld  := REG.io.exe && URT.io.is_LSU  //Validate LSU
-    LSU.io.opc  := REG.io.opcode  //Opcode
-    LSU.io.fc3  := REG.io.fc3_o   //Func3 Value
-    LSU.io.rs1  := REG.io.ls1     //Operand Data Word-1
-    LSU.io.rs2  := REG.io.ls2     //Operand Data Word-2
-    LSU.io.imm  := REG.io.imm     //Immediate Value
+    LSU.io.i_vld  := REG.io.o_exe && URT.io.o_is_LSU  //Validate LSU
+    LSU.io.i_opc  := REG.io.o_opcode  //Opcode
+    LSU.io.i_fc3  := REG.io.o_fc3_o   //Func3 Value
+    LSU.io.i_rs1  := REG.io.o_ls1     //Operand Data Word-1
+    LSU.io.i_rs2  := REG.io.o_ls2     //Operand Data Word-2
+    LSU.io.i_imm  := REG.io.o_imm     //Immediate Value
 
     //Stage-4: Branch Unit
-    BRU.io.vld  := REG.io.exe && URT.io.is_BRU  //Validate BRU
-    BRU.io.jal  := REG.io.opcode(3, 2)  //Opcode
-    BRU.io.rn1  := REG.io.rn1_o   //Read Register Number-1
-    BRU.io.rn2  := REG.io.rn2_o   //Read Register Number-2
-    BRU.io.fc3  := REG.io.fc3_o   //Func3 Value
-    BRU.io.fc7  := REG.io.fc7_o   //Func7 Value
-    BRU.io.rs1  := REG.io.bs1     //Operand Data Word-1
-    BRU.io.rs2  := REG.io.bs2     //Operand Data Word-2
-    BRU.io.imm  := REG.io.imm     //Operand Immediate Value
+    BRU.io.i_vld  := REG.io.o_exe && URT.io.o_is_BRU  //Validate BRU
+    BRU.io.i_jal  := REG.io.o_opcode(3, 2)  //Opcode
+    BRU.io.i_rn1  := REG.io.o_rn1_o   //Read Register Number-1
+    BRU.io.i_rn2  := REG.io.o_rn2_o   //Read Register Number-2
+    BRU.io.i_fc3  := REG.io.o_fc3_o   //Func3 Value
+    BRU.io.i_fc7  := REG.io.o_fc7_o   //Func7 Value
+    BRU.io.i_rs1  := REG.io.o_bs1     //Operand Data Word-1
+    BRU.io.i_rs2  := REG.io.o_bs2     //Operand Data Word-2
+    BRU.io.i_imm  := REG.io.o_imm     //Operand Immediate Value
 
 
     //Stage-5: Write-Back
-    REG.io.wed  := SCH.io.wed     //Write-enable
-    REG.io.wrb_r:= ALU.io.wrb || LSU.io.wrb || BRU.io.wrb
-    REG.io.wrb_d:= ALU.io.dst |  LSU.io.dst |  BRU.io.dst
+    REG.io.i_wed  := SCH.io.o_wed     //Write-enable
+    REG.io.i_wrb_r:= ALU.io.o_wrb || LSU.io.o_wrb || BRU.io.o_wrb
+    REG.io.i_wrb_d:= ALU.io.o_dst |  LSU.io.o_dst |  BRU.io.o_dst
 
 
     //Instruction Memory Interface
-    io.iadr     := BRU.io.pc      //Program Counter
-    io.ireq     := FCH.io.ireq    //Instr. Fetch Req.
-    FCH.io.iack := io.iack        //Instr. Fetch Ack.
+    io.iadr     := BRU.io.o_pc      //Program Counter
+    io.ireq     := FCH.io.o_ireq    //Instr. Fetch Req.
+    FCH.io.i_iack := io.iack        //Instr. Fetch Ack.
 
 
     //Data Memory Interface
-    io.dreq     := LSU.io.dreq    //Data Memory Access Req.
-    io.stor     := LSU.io.stor    //Store Req.
-    LSU.io.dack := io.dack        //Data Memory Access Ack.
+    io.dreq     := LSU.io.o_dreq    //Data Memory Access Req.
+    io.stor     := LSU.io.o_stor    //Store Req.
+    LSU.io.i_dack := io.dack        //Data Memory Access Ack.
 
-    io.mar      := LSU.io.dmar    //Data Memory Address
-    LSU.io.idat := io.idat        //Loading Data Word
-    io.odat     := LSU.io.odat    //Data Word I/F
+    io.mar      := LSU.io.o_dmar    //Data Memory Address
+    LSU.io.i_idat := io.idat          //Loading Data Word
+    io.odat     := LSU.io.o_odat    //Data Word I/F
 }
 
 object NicoNicoMain extends App {

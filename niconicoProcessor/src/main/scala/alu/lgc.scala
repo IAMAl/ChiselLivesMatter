@@ -15,25 +15,25 @@ class Lgc extends Module {
 
 
     /* Assign                       */
-    io.dst  := DontCare
-    when (io.vld) {
-        switch (io.fc3) {
+    io.o_dst  := DontCare
+    when (io.i_vld) {
+        switch (io.i_fc3) {
             is(params.Parameters.FC3_XOR.U) {
                 //Bit-Wise XOR
-                io.dst   := io.rs1 ^ io.rs2
+                io.o_dst   := io.i_rs1 ^ io.i_rs2
             }
             is(params.Parameters.FC3_OR.U) {
                 //Bit-Wise OR
-                io.dst   := io.rs1 | io.rs2
+                io.o_dst   := io.i_rs1 | io.i_rs2
             }
             is(params.Parameters.FC3_AND.U) {
                 //Bit-Wise AND
-                io.dst   := io.rs1 & io.rs2
+                io.o_dst   := io.i_rs1 & io.i_rs2
             }
         }
     }
     .otherwise {
         //NOP
-        io.dst   := 0.U
+        io.o_dst   := 0.U
     }
 }

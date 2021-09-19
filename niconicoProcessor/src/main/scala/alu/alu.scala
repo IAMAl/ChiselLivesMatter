@@ -11,14 +11,14 @@ class ALU extends Module {
 
     /* I/O                          */
     val io = IO(new Bundle {
-        val vld     = Input( Bool())                                // Exec Validation
-        val rs1     = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-1
-        val rs2     = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-2
-        val fc3     = Input( UInt((params.Parameters.Fc3Width).W))  // Immadiate (Func3)
-        val fc7     = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
-        val dst     = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
-        val wrb     = Output(Bool())                                // Writeback Request
-        val UnitID  = Input( UInt(3.W))                             // Operation Unit ID
+        val i_vld       = Input( Bool())                                // Exec Validation
+        val i_rs1       = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-1
+        val i_rs2       = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-2
+        val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))  // Immadiate (Func3)
+        val i_fc7       = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
+        val o_dst       = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
+        val o_wrb       = Output(Bool())                                // Writeback Request
+        val i_UnitID    = Input( UInt(3.W))                             // Operation Unit ID
     })
 
     /* Module                       */
@@ -34,31 +34,31 @@ class ALU extends Module {
 
     /* Assign                       */
     //Adder
-    Add.io.vld   := (io.UnitID === (params.Parameters.UnitID_Add).U) && io.vld
-    Add.io.fc3   := io.fc3
-    Add.io.fc7   := io.fc7
-    Add.io.rs1   := io.rs1
-    Add.io.rs2   := io.rs2
+    Add.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Add).U) && io.i_vld
+    Add.io.i_fc3    := io.i_fc3
+    Add.io.i_fc7    := io.i_fc7
+    Add.io.i_rs1    := io.i_rs1
+    Add.io.i_rs2    := io.i_rs2
 
     //Logic
-    Lgc.io.vld   := (io.UnitID === (params.Parameters.UnitID_Lgc).U) && io.vld
-    Lgc.io.fc3   := io.fc3
-    Lgc.io.fc7   := io.fc7
-    Lgc.io.rs1   := io.rs1
-    Lgc.io.rs2   := io.rs2
+    Lgc.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Lgc).U) && io.i_vld
+    Lgc.io.i_fc3    := io.i_fc3
+    Lgc.io.i_fc7    := io.i_fc7
+    Lgc.io.i_rs1    := io.i_rs1
+    Lgc.io.i_rs2    := io.i_rs2
 
     //Shifter
-    Sft.io.vld   := (io.UnitID === (params.Parameters.UnitID_Sft).U) && io.vld
-    Sft.io.fc3   := io.fc3
-    Sft.io.fc7   := io.fc7
-    Sft.io.rs1   := io.rs1
-    Sft.io.rs2   := io.rs2
+    Sft.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Sft).U) && io.i_vld
+    Sft.io.i_fc3    := io.i_fc3
+    Sft.io.i_fc7    := io.i_fc7
+    Sft.io.i_rs1    := io.i_rs1
+    Sft.io.i_rs2    := io.i_rs2
 
     //Output
-    vld     := io.vld
-    io.wrb  := vld
+    vld         := io.i_vld
+    io.o_wrb    := vld
 
     //ORed by NOP (Zero-Output when NOP on Operation Unit)
-    dst     := Add.io.dst | Lgc.io.dst | Sft.io.dst
-    io.dst  := dst
+    dst         := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
+    io.o_dst    := dst
 }
