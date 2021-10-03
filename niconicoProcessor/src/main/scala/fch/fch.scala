@@ -36,7 +36,7 @@ class FCH extends Module {
     exe := LdReq.io.LdValid && !io.i_brc && !io.i_stall
 
     //Capture Instruction Register
-    when LdReq.io.o_LdValid) {
+    when (LdReq.io.o_LdValid) {
         IR  := io.i_ifch
     }
 

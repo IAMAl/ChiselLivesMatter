@@ -89,19 +89,19 @@ class LSU extends Module {
     ISA_fc3_lsu.io.fc3  := io.fc3
 
     //Load-Data Word Formatter
-    when(io.fc3 === (params.Parameters.FC3_BYTEU).U) {
+    when(io.fc3 === (params.Parameters.FC3_BYTE).U) {
         //1-Byte Word with Sign-Extension
         dat := io.idat( 7, 0).asSInt.asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORDU).U) {
+    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORD).U) {
         //2-Byte Word with Sign-Extension
         dat := io.idat(15, 0).asSInt.asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_BYTE).U) {
+    .elsewhen(io.fc3 === (params.Parameters.FC3_BYTEU).U) {
         //1-Byte Word
         dat := io.idat( 7, 0).asUInt
     }
-    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORD).U) {
+    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORDU).U) {
         //2-Byte Word
         dat := io.idat(15, 0).asUInt
     }

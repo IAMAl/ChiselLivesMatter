@@ -33,7 +33,7 @@ class Add extends Module {
     }
 
     //Addition
-    //Carry-in for Subtraction to make 2's Complemt Binary
+    //Carry-in for Subtraction to make 2's Complent Binary
     c_in    := (io.fc7 === (params.Parameters.FC7_SUB).U).asUInt
     when (io.vld) {
         //Addition

@@ -43,13 +43,13 @@ class BRU extends Module {
 
     /* Assign                       */
     //Jump-Immediate Composition
-    imm     := Cat(io.i_fc7, io.i_rn2, io.i_rn1, io.i_fc3).asSInt((params.Parameters.AddrWidth).W)
+    imm     := Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, io.i_fc3))).asSInt((params.Parameters.AddrWidth).W)
     when (io.i_jal === JAL) {
         //Jump and Link
-        jmp := Cat(imm(20), imm(7, 0), imm(8), imm(19, 9)).asUInt((params.Parameters.AddrWidth).W).asSInt()
+        jmp := Cat(imm(20), Cat(imm(7, 0), Cat(imm(8), imm(19, 9)))).asUInt((params.Parameters.AddrWidth).W).asSInt()
     }
     .elsewhen (io.i_jal === JALR) {
-        //Jump and Link Register
+        //Jump and Link with Register-0
         jmp := imm(20, 9).asSInt((params.Parameters.AddrWidth+1).W)
     }
     .otherwise {
