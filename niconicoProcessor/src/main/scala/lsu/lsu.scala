@@ -85,35 +85,19 @@ class LSU extends Module {
     ISA_fc3_lsu.io.i_fc3  := io.i_fc3
 
     //Load-Data Word Formatter
-<<<<<<< HEAD
-    when(io.fc3 === (params.Parameters.FC3_BYTE).U) {
-=======
-    when(io.i_fc3 === (params.Parameters.FC3_BYTEU).U) {
->>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
+    when(io.i_fc3 === (params.Parameters.FC3_BYTE).U) {
         //1-Byte Word with Sign-Extension
         dat := io.i_idat( 7, 0).asSInt.asUInt
     }
-<<<<<<< HEAD
-    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORD).U) {
-=======
-    .elsewhen(io.i_fc3 === (params.Parameters.FC3_HWORDU).U) {
->>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_HWORD).U) {
         //2-Byte Word with Sign-Extension
         dat := io.i_idat(15, 0).asSInt.asUInt
     }
-<<<<<<< HEAD
-    .elsewhen(io.fc3 === (params.Parameters.FC3_BYTEU).U) {
-=======
-    .elsewhen(io.i_fc3 === (params.Parameters.FC3_BYTE).U) {
->>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_BYTEU).U) {
         //1-Byte Word
         dat := io.i_idat( 7, 0).asUInt
     }
-<<<<<<< HEAD
-    .elsewhen(io.fc3 === (params.Parameters.FC3_HWORDU).U) {
-=======
-    .elsewhen(io.i_fc3 === (params.Parameters.FC3_HWORD).U) {
->>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
+    .elsewhen(io.i_fc3 === (params.Parameters.FC3_HWORDU).U) {
         //2-Byte Word
         dat := io.i_idat(15, 0).asUInt
     }

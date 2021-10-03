@@ -58,14 +58,8 @@ class ALU extends Module {
     vld         := io.i_vld
     io.o_wrb    := vld
 
-<<<<<<< HEAD
     //ORed 
     //Exclusive-Output by NOP
-    dst     := Add.io.dst | Lgc.io.dst | Sft.io.dst
-    io.dst  := dst
-=======
-    //ORed by NOP (Zero-Output when NOP on Operation Unit)
-    dst         := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
-    io.o_dst    := dst
->>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
+    dst     := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
+    io.o_dst  := dst
 }
