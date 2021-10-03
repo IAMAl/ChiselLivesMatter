@@ -7,6 +7,15 @@ import chisel3.util._
 
 import params._
 
+class Load_IO extends Bundle {
+        val LdReq   = Input( Bool())
+        val LdAck   = Input( Bool())
+        val Stall   = Input( Bool())
+        val Req     = Output(Bool())
+        val LdValid = Output(Bool())
+        val Busy    = Output(Bool())
+}
+
 class LSU_IO extends Bundle {
     val i_vld = Input( Bool())                                  //Activate Operation
     val i_opc = Input( UInt((params.Parameters.OpcWidth).W))    //Opcode

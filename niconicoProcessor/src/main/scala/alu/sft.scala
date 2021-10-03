@@ -15,33 +15,33 @@ class Sft extends Module {
 
 
     /* Assign                       */
-    when (io.vld) {
-        when (io.fc3 === (params.Parameters.FC3_SR).U) {
-            when (io.fc7 === (params.Parameters.FC7_ART).U) {
+    when (io.i_vld) {
+        when (io.i_fc3 === (params.Parameters.FC3_SR).U) {
+            when (io.i_fc7 === (params.Parameters.FC7_ART).U) {
                 //Arithmetic Right Shift
                 //Signed Integer makes Sign-fill
-                io.dst   := (io.rs1.asSInt >> io.rs2(4, 0)).asUInt
+                io.o_dst    := (io.i_rs1.asSInt >> io.i_rs2(4, 0)).asUInt
             }
-            .elsewhen (io.fc7 === (params.Parameters.FC7_LGC).U) {
+            .elsewhen (io.i_fc7 === (params.Parameters.FC7_LGC).U) {
                 //Logical Right Shift
-                io.dst   := io.rs1 >> io.rs2(4, 0)
+                io.o_dst    := io.i_rs1 >> io.i_rs2(4, 0)
             }
             .otherwise {
                 //NOP
-                io.dst   := 0.U
+                io.o_dst    := 0.U
             }
         }
-        .elsewhen (io.fc3 === (params.Parameters.FC3_SL).U) {
+        .elsewhen (io.i_fc3 === (params.Parameters.FC3_SL).U) {
             //Logical Left Shift
-            io.dst  := io.rs1 << io.rs2(4, 0)
+            io.o_dst    := io.i_rs1 << io.i_rs2(4, 0)
         }
         .otherwise {
             //NOP
-            io.dst  := 0.U
+            io.o_dst    := 0.U
         }
     }
     .otherwise {
         //NOP
-        io.dst   := 0.U
+        io.o_dst    := 0.U
     }
 }

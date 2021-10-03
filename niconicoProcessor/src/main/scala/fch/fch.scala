@@ -27,16 +27,20 @@ class FCH extends Module {
 
     /* Assign                       */
     //Access Validation
-    LdReq.io.i_LdReq    := io.i_boot
-    LdReq.io.i_LdAck    := io.i_iack
-    LdReq.io.i_Stall    := io.i_stall
+    LdReq.io.LdReq    := io.i_boot
+    LdReq.io.LdAck    := io.i_iack
+    LdReq.io.Stall    := io.i_stall
     //LdReq.io.Busy
 
     //Valid Followed Pipeline Stage
     exe := LdReq.io.LdValid && !io.i_brc && !io.i_stall
 
     //Capture Instruction Register
+<<<<<<< HEAD
     when (LdReq.io.o_LdValid) {
+=======
+    when (LdReq.io.LdValid) {
+>>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
         IR  := io.i_ifch
     }
 

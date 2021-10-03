@@ -14,26 +14,26 @@ class ISA_Opcode extends Module {
      /* I/O                          */
     val io = IO(new Bundle {
         //Opcode
-        val opc         = Input( UInt((params.Parameters.OpcWidth).W))
+        val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
 
         //Operation Type
-        val OpcodeType  = Output(UInt(3.W))
+        val o_OpcodeType= Output(UInt(3.W))
     })
 
     //Opcode Classification
-    io.OpcodeType   := io.opc(params.Parameters.OpcWidth-1, params.Parameters.OpcWidth-3)
+    io.o_OpcodeType   := io.i_opc(params.Parameters.OpcWidth-1, params.Parameters.OpcWidth-3)
 }
 
 class ISA_fc3_lsu extends Module {
 
      /* I/O                          */
     val io = IO(new Bundle {
-        val fc3     = Input( UInt((params.Parameters.Fc3Width).W))
-        val LSType  = Output(UInt((params.Parameters.Fc3Width-1).W))
-        val usign   = Output(Bool())
+        val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))
+        val o_LSType    = Output(UInt((params.Parameters.Fc3Width-1).W))
+        val o_usign     = Output(Bool())
     })
 
     //Memory Access Classification
-    io.LSType   := io.fc3(params.Parameters.Fc3Width-2, 0)
-    io.usign    := io.fc3(params.Parameters.Fc3Width-1)
+    io.o_LSType := io.i_fc3(params.Parameters.Fc3Width-2, 0)
+    io.o_usign  := io.i_fc3(params.Parameters.Fc3Width-1)
 }

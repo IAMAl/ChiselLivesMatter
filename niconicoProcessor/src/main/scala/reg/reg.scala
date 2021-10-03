@@ -113,7 +113,7 @@ class REG extends Module {
     }
 
     //Load/Store Source Operands
-    when ((io.i_opc === (params.Parameters.OP_STORE).U) || (io.o_opc === (params.Parameters.OP_LOAD).U)) {
+    when ((io.i_opc === (params.Parameters.OP_STORE).U) || (io.i_opc === (params.Parameters.OP_LOAD).U)) {
         //Set Load/Store Reference Data
         io.o_ls1    := rs1
         io.o_ls2    := rs2

@@ -156,17 +156,17 @@ class SCH extends Module {
 
     /* Hazard Detection         */
     //Write-After-Write
-    WAWDst(0)   := (RegWNo(0) === io.i_wno)  && RegVld(0) && !ImmDst(0)
+    WAWDst(0)   := (RegWNo(0) === ISplit.io.o_wno)  && RegVld(0) && !ImmDst(0)
     WAWDst(1)   := (RegWNo(1) === RegWNo(0)) && RegVld(1) && !ImmDst(1)
     WAWDst(2)   := (RegWNo(2) === RegWNo(0)) && RegVld(2) && !ImmDst(2)
     WAWDst(3)   := (RegWNo(3) === RegWNo(0)) && RegVld(3)
 
     //Write-After-Read
-    WARSr1(0)   := (RegRN1(0) === io.i_wno)
+    WARSr1(0)   := (RegRN1(0) === ISplit.io.o_wno)
     WARSr1(1)   := (RegRN1(1) === RegWNo(0))
     WARSr1(2)   := (RegRN1(2) === RegWNo(0))
 
-    WARSr2(0)   := (RegRN2(0) === io.i_wno)
+    WARSr2(0)   := (RegRN2(0) === ISplit.io.o_wno)
     WARSr2(1)   := (RegRN2(1) === RegWNo(0))
     WARSr2(2)   := (RegRN2(2) === RegWNo(0))
 

@@ -10,9 +10,9 @@ import params._
 
 class BRU extends Module {
 
-    val InitPC  = params.Parameters.InitPC
-    val JAL     = params.Parameters.OP_JAL
-    val JALR    = params.Parameters.OP_JALR
+    val InitPC  = params.Parameters.InitPC.U
+    val JAL     = params.Parameters.OP_JAL.U
+    val JALR    = params.Parameters.OP_JALR.U
 
     /* I/O                          */
     val io      = IO(new BRU_IO)
@@ -22,10 +22,10 @@ class BRU extends Module {
     val WRB     = RegInit(Bool(), false.B)
 
     //Program Counter
-    val PC      = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC.U)
+    val PC      = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
 
     //Link Register
-    val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC.U)
+    val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
 
     /* Wire                         */
     //Brach Condition
@@ -43,6 +43,7 @@ class BRU extends Module {
 
     /* Assign                       */
     //Jump-Immediate Composition
+<<<<<<< HEAD
     imm     := Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, io.i_fc3))).asSInt((params.Parameters.AddrWidth).W)
     when (io.i_jal === JAL) {
         //Jump and Link
@@ -51,6 +52,16 @@ class BRU extends Module {
     .elsewhen (io.i_jal === JALR) {
         //Jump and Link with Register-0
         jmp := imm(20, 9).asSInt((params.Parameters.AddrWidth+1).W)
+=======
+    imm     := Cat(io.i_fc7, io.i_rn2, io.i_rn1, io.i_fc3).asSInt()
+    when (io.i_jal === JAL) {
+        //Jump and Link
+        jmp := Cat(imm(20), imm(7, 0), imm(8), imm(19, 9)).asUInt().asSInt()
+    }
+    .elsewhen (io.i_jal === JALR) {
+        //Jump and Link Register
+        jmp := imm(20, 9).asSInt()
+>>>>>>> 2349154a283221fa59c61451cf986303fd766a3a
     }
     .otherwise {
         jmp := 0.S
@@ -58,11 +69,11 @@ class BRU extends Module {
 
     PC_in   := PC.asUInt
     BRC     := DontCare
-    when (io.vld) {
+    when (io.i_vld) {
         //Program Counter and Link
         when (io.i_jal === JAL) {
             //Jump and Link
-            PC  := jmp << 1.U
+            PC  := (jmp.asTypeOf(Bits()) << 1.U).asUInt
             LNK := PC + 4.U
         }
         .elsewhen (io.i_jal === JALR) {
@@ -80,7 +91,7 @@ class BRU extends Module {
         }
 
         //Branch Condition
-        switch(io.fc3) {
+        switch(io.i_fc3) {
             is((params.Parameters.FC3_BEQ).U) {
                 //Equal (Signed)
                 BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt).asBool
