@@ -24,10 +24,10 @@ class REG_IO extends Bundle {
     val i_fc3   = Input(UInt((params.Parameters.Fc3Width).W))       //Function-3 Port
     val i_fc7   = Input(UInt((params.Parameters.Fc7Width).W))       //Function-7 Port
 
-    val o_rn1_o = Output(UInt((params.Parameters.LogNumReg).W))     //Register Read No-1
-    val o_rn2_o = Output(UInt((params.Parameters.LogNumReg).W))     //Register Read No-2
-    val o_fc3_o = Output(UInt((params.Parameters.Fc3Width).W))      //Function-3 Port
-    val o_fc7_o = Output(UInt((params.Parameters.Fc7Width).W))      //Function-7 Port
+    val o_rn1   = Output(UInt((params.Parameters.LogNumReg).W))     //Register Read No-1
+    val o_rn2   = Output(UInt((params.Parameters.LogNumReg).W))     //Register Read No-2
+    val o_fc3   = Output(UInt((params.Parameters.Fc3Width).W))      //Function-3 Port
+    val o_fc7   = Output(UInt((params.Parameters.Fc7Width).W))      //Function-7 Port
 
     val i_wrb_r = Input(Bool())                                     //Write-back Req.
     val i_wrb_d = Input(UInt((params.Parameters.DatWidth).W))       //Write-back Data
