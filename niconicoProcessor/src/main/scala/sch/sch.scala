@@ -216,9 +216,9 @@ class SCH extends Module {
     }
 
     io.o_opc    := RegOpc
+    io.o_wno    := RegWNo(0)
     io.o_rn1    := RegRN1(0)
     io.o_rn2    := RegRN2(0)
-    io.o_wno    := RegWNo(0)
     io.o_fc3    := RegFc3
     io.o_fc7    := RegFc7
 

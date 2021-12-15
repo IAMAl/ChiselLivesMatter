@@ -14,13 +14,13 @@ class REG_IO extends Bundle {
     val i_by1   = Input( Bool())                                    //Bypassing Flag from EX-Stage-1
     val i_by2   = Input( Bool())                                    //Bypassing Flag from EX-Stage-2
 
+    val i_wed   = Input( Bool())                                    //Register Write Enable
     val i_re1   = Input( Bool())                                    //Register Read Enable-1
     val i_re2   = Input( Bool())                                    //Register Read Enable-2
-    val i_wed   = Input( Bool())                                    //Register Write Enable
 
+    val i_wno   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Write No
     val i_rn1   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Read No-1
     val i_rn2   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Read No-2
-    val i_wno   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Write No
     val i_fc3   = Input(UInt((params.Parameters.Fc3Width).W))       //Function-3 Port
     val i_fc7   = Input(UInt((params.Parameters.Fc7Width).W))       //Function-7 Port
 

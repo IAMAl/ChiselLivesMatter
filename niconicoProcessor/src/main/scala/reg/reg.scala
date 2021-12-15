@@ -40,13 +40,13 @@ class REG extends Module {
 
     /* Assign                       */
     //Immediate's Pre-Formatting
-    when (io.i_opc === (params.Parameters.OP_STORE).U) {      //Store
+    when (io.i_opc === (params.Parameters.OP_STORE).U) {        //Store
         imm := Cat(io.i_fc7, io.i_wno)
     }
-    .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {  //Load
+    .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {    //Load
         imm := Cat(io.i_fc7, io.i_rn2)
     }
-    .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) { //Branch/Jump
+    .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) {   //Branch/Jump
         imm := Cat(io.i_fc7(6), Cat(io.i_wno(0), Cat(io.i_fc7(5,0), Cat(io.i_wno(4, 1), 0.U.asTypeOf(UInt(1.W))))))
     }
 
@@ -76,6 +76,10 @@ class REG extends Module {
         .elsewhen (io.i_re2) {
             //Read Register File
             rs2 := RF(io.i_rn2)
+        }
+        .otherwise{
+            //Set Immediate
+            rs2 := Cat(io.i_fc7, io.i_rn2)
         }
     }
 
