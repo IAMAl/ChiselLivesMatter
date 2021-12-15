@@ -42,24 +42,10 @@ class BRU extends Module {
     //Jump Address
     val jmp     = Wire(SInt((params.Parameters.AddrWidth).W))
 
-    //Immediate to Jump/Branch
-    val imm     = Wire(SInt((params.Parameters.AddrWidth).W))
-
 
     /* Assign                       */
-    //Jump-Immediate Composition
-    imm     := Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, io.i_fc3))).asSInt()
-    when (io.i_jal === JAL) {
-        //Jump and Link
-        jmp := Cat(imm(19), Cat(imm(10, 1), Cat(imm(12), Cat(imm(18, 11), 0.U.asTypeOf(UInt(1.W)))))
-    }
-    .elsewhen (io.i_jal === JALR) {
-        //Jump and Link with Register-0
-        jmp := imm(19, 8).asSInt()
-    }
-    .otherwise {
-        jmp := 0.S
-    }
+    //Jump and Link
+    jmp := io.i_imm
 
     PC_in   := PC
     BRC     := DontCare
