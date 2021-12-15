@@ -27,6 +27,10 @@ class BRU extends Module {
     //Link Register
     val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
 
+    // Branch Condition
+    val BC      = RegInit(Bool(), false.B)
+
+
     /* Wire                         */
     //Brach Condition
     val BRC     = Wire(Bool())
@@ -46,33 +50,33 @@ class BRU extends Module {
     imm     := Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, io.i_fc3))).asSInt()
     when (io.i_jal === JAL) {
         //Jump and Link
-        jmp := Cat(imm(20), Cat(imm(7, 0), Cat(imm(8), imm(19, 9)))).asUInt().asSInt()
+        jmp := Cat(imm(19), Cat(imm(10, 1), Cat(imm(12), Cat(imm(18, 11), 0.U.asTypeOf(UInt(1.W)))))
     }
     .elsewhen (io.i_jal === JALR) {
         //Jump and Link with Register-0
-        jmp := imm(20, 9).asSInt()
+        jmp := imm(19, 8).asSInt()
     }
     .otherwise {
         jmp := 0.S
     }
 
-    PC_in   := PC.asUInt
+    PC_in   := PC
     BRC     := DontCare
     when (io.i_vld) {
         //Program Counter and Link
         when (io.i_jal === JAL) {
             //Jump and Link
-            PC  := (jmp.asTypeOf(Bits()) << 1.U).asUInt
+            PC  := jmp
             LNK := PC + 4.U
         }
         .elsewhen (io.i_jal === JALR) {
             //Jump and Link Register
-            PC  := io.i_rs1 + jmp.asUInt
+            PC  := io.i_rs1 + jmp.asSInt
             LNK := PC + 4.U
         }
         .elsewhen (BRC && (io.i_jal === 0.U)) {
             //Branch Taken
-            PC  := PC_in + io.i_imm.asUInt
+            PC  := PC_in + io.i_imm.asSInt
         }
         .elsewhen (!BRC && (io.i_jal === 0.U)) {
             //Branch NOT Taken
@@ -110,7 +114,8 @@ class BRU extends Module {
 
     /* Output                       */
     //Branch Condition
-    io.o_brc    := BRC
+    BC          := BRC
+    io.o_brc    := BC
 
     //Program Counter Value
     io.o_pc     := PC
