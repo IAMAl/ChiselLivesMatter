@@ -17,6 +17,7 @@ class BRU extends Module {
     /* I/O                          */
     val io      = IO(new BRU_IO)
 
+
     /* Register                     */
     //Write-back Flag
     val WRB     = RegInit(Bool(), false.B)
@@ -87,30 +88,31 @@ class BRU extends Module {
         switch(io.i_fc3) {
             is((params.Parameters.FC3_BEQ).U) {
                 //Equal (Signed)
-                BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BNE).U) {
                 //Not Equal (Signed)
-                BRC    := (io.i_rs1.asSInt =/= io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt =/= io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BLT).U) {
                 //Less Than (Signed)
-                BRC    := (io.i_rs1.asSInt <   io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt <   io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BGE).U) {
                 //Greater Than or Equal (Signed)
-                BRC    := (io.i_rs1.asSInt >=  io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt >=  io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BLTU).U) {
                 //Less Than (Unsigned)
-                BRC    := (io.i_rs1 <  io.i_rs2).asBool
+                BRC    := (io.i_rs1 <  io.i_rs2)
             }
             is((params.Parameters.FC3_BGEU).U) {
                 //Greater Than or Equal (Unsigned)
-                BRC    := (io.i_rs1 >= io.i_rs2).asBool
+                BRC    := (io.i_rs1 >= io.i_rs2)
             }
         }
     }
+
 
     /* Output                       */
     //Branch Condition
