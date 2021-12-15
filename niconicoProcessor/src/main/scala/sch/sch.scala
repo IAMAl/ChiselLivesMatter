@@ -72,6 +72,7 @@ class SCH extends Module {
     val StallRead   = Wire(Bool())
     val StallBranch = Wire(Bool())
 
+    //Immediate Value
     val imm_SB      = Wire(Bool())
     val imm_LBA     = Wire(Bool())
 
