@@ -10,6 +10,7 @@ object Parameters {
     val ISAWidth    = 32
 
     //Instruction Bit-Field Width
+    val ILEnc       = 2 
     val OpcWidth    = 7
     val Fc3Width    = 3
     val Fc7Width    = 7
@@ -37,13 +38,21 @@ object Parameters {
     val MSB_Fc7     = ISAWidth - 1
 
     //Opcode Type
+    //Instr[6:4]
+    val OP_Type0_LSb= 2
+    val OP_Type0_LSb= 3
+    val OP_Type1_LSb= 4
+    val OP_Type1_LSb= 6
+
     val OP_BRJMP    = 0x6   //Branch/Jump
     val OP_LOAD     = 0x0   //Load
     val OP_STORE    = 0x2   //Store
     val OP_RandI    = 0x1   //Register and Immediate
     val OP_RandR    = 0x3   //Register and Register
-    val OP_JAL      = 0x3   //Jump and Link
-    val OP_JALR     = 0x1   //Jump and Link Register
+    val OP_JAL0     = 0x3   //Jump and Link
+    val OP_JAL1     = 0x3   //Jump and Link
+    val OP_JALR0    = 0x1   //Jump and Link Register
+    val OP_JALR1    = 0x6   //Jump and Link Register
 
     //FC-3 Encode
     //Adder
@@ -73,13 +82,14 @@ object Parameters {
     val FC3_BYTEU   = 0x4
     val FC3_HWORDU  = 0x5
 
+    //Interger R-R Func7 Bit-Field
     //Adder Operation-ID
     val FC7_ADD     = 0x00
-    val FC7_SUB     = 0x20
+    val FC7_SUB     = 0x02
 
     //Shifter Operation-ID
     val FC7_LGC     = 0x00
-    val FC7_ART     = 0x20
+    val FC7_ART     = 0x02
 
     //ALU Sub-Route ID
     val UnitID_Add  = 0
@@ -91,4 +101,60 @@ object Parameters {
 
     //Initial Value for Program Counter (PC)
     val InitPC      = 0x00000000
+
+    //Immediate Pack Bit-Position
+    val IMM_LSb     = 19
+    val IMM_MSb     = 31
+
+    //ADDI/SLTI[U]/ANDI/ORI/XORI
+    //I-immediate[11:0]
+    val ALU_IMM_LSb = 20 - IMM_LSb
+    val ALU_IMM_MSb = 31 - IMM_LSb
+
+    //SLLI/SRLI/SRAI
+    //imm[11:5], shamt[4:0]
+    val SFT_IMM_LSb = 20 - IMM_LSb
+    val SFT_IMM_MSb = 31 - IMM_LSb
+
+    //LUI/AUIPC
+    //U-immediate[31:12]
+    val LAU_IMM_LSb = 12
+    val ALU_IMM_MSb = 31
+
+    //JAL: OFFSET[20:1]
+    val JAL_IMM0_LSb= 21 - IMM_LSb
+    val JAL_IMM0_MSb= 30 - IMM_LSb
+    val JAL_IMM1_LSb= 20 - IMM_LSb
+    val JAL_IMM1_MSb= 20 - IMM_LSb
+    val JAL_IMM2_LSb= 12
+    val JAL_IMM2_MSb= 19 - IMM_LSb
+    val JAL_IMM3_LSb= 31 - IMM_LSb
+    val JAL_IMM3_MSb= 31 - IMM_LSb
+
+    //JALR offset[11:0]
+    val JALR_FC3_Val    = 0
+    val JALR_IMM0_LSb   = 20 - IMM_LSb
+    val JALR_IMM0_MSb   = 31 - IMM_LSb
+
+    //BRANCH
+    //offset[12:1]
+    val BR_OFFSET0_LSb  = 25
+    val BR_OFFSET0_MSb  = 30
+    val BR_OFFSET1_LSb  = 7
+    val BR_OFFSET1_MSb  = 7
+    val BR_OFFSET2_LSb  = 31
+    val BR_OFFSET2_MSb  = 31
+
+    //LOAD
+    //offset[11:0]
+    val LD_OFFSET_LSb   = 20
+    val LD_OFFSET_MSb   = 31
+
+    //STORE
+    //offset[11:0]
+    val ST_OFFSET0_LSb  = 7
+    val ST_OFFSET0_MSb  = 11
+    val ST_OFFSET1_LSb  = 25
+    val ST_OFFSET1_MSb  = 31
+
 }

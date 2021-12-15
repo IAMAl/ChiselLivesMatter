@@ -8,6 +8,20 @@ import chisel3.util._
 
 import params._
 
+class ISA_ILEncode extends Module {
+
+     /* I/O                          */
+    val io = IO(new Bundle {
+        //Opcode
+        val i_ilenc     = Input( UInt((params.Parameters.ILEnc).W))
+
+        //Operation Type
+        val o_ilv       = Output(Bool())
+    })
+
+    //Check 32b-Length ISA
+    io.o_ilv    := (io.i_ilenc === 3.U)
+}
 
 class ISA_Opcode extends Module {
 
