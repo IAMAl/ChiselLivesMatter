@@ -10,6 +10,7 @@ import isa._
 
 class Lgc extends Module {
 
+
     /* I/O                          */
     val io = IO(new ALU_IO)
 

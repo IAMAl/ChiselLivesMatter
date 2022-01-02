@@ -29,12 +29,8 @@ class BRU extends Module {
     //Link Register
     val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
 
-<<<<<<< HEAD
-=======
     // Branch Condition
     val BC      = RegInit(Bool(), false.B)
-
->>>>>>> dc31a2e021a9e3b842c0209894201e82fdf88dd0
 
     /* Wire                         */
     //Brach Condition
@@ -48,7 +44,6 @@ class BRU extends Module {
 
 
     /* Assign                       */
-<<<<<<< HEAD
     //Jump-Immediate Composition
     imm     := io.i_imm
     when (io.i_jal === JAL) {
@@ -62,10 +57,6 @@ class BRU extends Module {
     .otherwise {
         jmp := 0.S
     }
-=======
-    //Jump and Link
-    jmp := io.i_imm
->>>>>>> dc31a2e021a9e3b842c0209894201e82fdf88dd0
 
     PC_in   := PC
     BRC     := DontCare

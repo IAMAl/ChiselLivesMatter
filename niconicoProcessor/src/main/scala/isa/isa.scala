@@ -10,6 +10,7 @@ import params._
 
 class ISA_ILEncode extends Module {
 
+
      /* I/O                          */
     val io = IO(new Bundle {
         //Opcode

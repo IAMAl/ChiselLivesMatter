@@ -10,8 +10,10 @@ import params._
 
 class ISplit extends Module {
 
+
     /* I/O                      */
     val io = IO(new ISplit_IO)
+
 
     /* Register                 */
     //Captures Bit-Fields in Instruction
@@ -21,6 +23,7 @@ class ISplit extends Module {
     val rn2 = Reg(UInt((params.Parameters.LogNumReg).W))
     val fc3 = Reg(UInt((params.Parameters.Fc3Width).W))
     val fc7 = Reg(UInt((params.Parameters.Fc7Width).W))
+
 
     /* Assign                   */
     //Bit-Field Extraction

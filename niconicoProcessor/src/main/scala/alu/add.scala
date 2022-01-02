@@ -10,12 +10,15 @@ import isa._
 
 class Add extends Module {
 
+
     /* I/O                          */
     val io = IO(new ALU_IO)
+
 
     /* Wire                         */
     val rs2     = Wire(UInt((params.Parameters.DatWidth).W))
     val c_in    = Wire(UInt(1.W))
+
 
     /* Assign                       */
     //Selection of Right-Source Operand

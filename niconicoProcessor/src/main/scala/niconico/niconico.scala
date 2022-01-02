@@ -16,6 +16,7 @@ import lsu._
 
 class NicoNico extends Module {
 
+
     /* I/O                    		*/
     val io = IO(new NICO2_IO)
 

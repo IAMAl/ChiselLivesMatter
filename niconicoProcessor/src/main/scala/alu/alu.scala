@@ -9,6 +9,7 @@ import params._
 
 class ALU extends Module {
 
+
     /* I/O                          */
     val io = IO(new Bundle {
         val i_vld       = Input( Bool())                                // Exec Validation
@@ -20,6 +21,7 @@ class ALU extends Module {
         val o_wrb       = Output(Bool())                                // Writeback Request
         val i_UnitID    = Input( UInt(3.W))                             // Operation Unit ID
     })
+
 
     /* Module                       */
     val Add     = Module(new Add)       //Adder
