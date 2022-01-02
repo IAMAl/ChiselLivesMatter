@@ -60,6 +60,6 @@ class ALU extends Module {
 
     //ORed 
     //Exclusive-Output by NOP
-    dst     := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
-    io.o_dst  := dst
+    dst         := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
+    io.o_dst    := dst
 }

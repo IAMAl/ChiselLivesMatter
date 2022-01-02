@@ -14,8 +14,10 @@ class BRU extends Module {
     val JAL     = params.Parameters.OP_JAL.U
     val JALR    = params.Parameters.OP_JALR.U
 
+
     /* I/O                          */
     val io      = IO(new BRU_IO)
+
 
     /* Register                     */
     //Write-back Flag
@@ -26,6 +28,7 @@ class BRU extends Module {
 
     //Link Register
     val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
+
 
     /* Wire                         */
     //Brach Condition
@@ -43,7 +46,7 @@ class BRU extends Module {
 
     /* Assign                       */
     //Jump-Immediate Composition
-    imm     := Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, io.i_fc3))).asSInt()
+    imm     := io.i_imm
     when (io.i_jal === JAL) {
         //Jump and Link
         jmp := Cat(imm(20), Cat(imm(7, 0), Cat(imm(8), imm(19, 9)))).asUInt().asSInt()
@@ -62,7 +65,7 @@ class BRU extends Module {
         //Program Counter and Link
         when (io.i_jal === JAL) {
             //Jump and Link
-            PC  := (jmp.asTypeOf(Bits()) << 1.U).asUInt
+            PC  := Cat(jmp, 0.S.asTypeOf(SInt(1.W))).asUInt
             LNK := PC + 4.U
         }
         .elsewhen (io.i_jal === JALR) {
@@ -107,6 +110,7 @@ class BRU extends Module {
             }
         }
     }
+
 
     /* Output                       */
     //Branch Condition

@@ -11,10 +11,6 @@ class BRU_IO extends Bundle {
     val i_vld = Input( Bool())                                  //BRJ Operation Validation
     val i_rs1 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-1 Port
     val i_rs2 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-2 Port
-    val i_rn1 = Input( UInt((params.Parameters.LogNumReg).W))   //Register Read No-1
-    val i_rn2 = Input( UInt((params.Parameters.LogNumReg).W))   //Register Read No-2
-    val i_fc3 = Input( UInt((params.Parameters.Fc3Width).W))    //Function-3 Port
-    val i_fc7 = Input( UInt((params.Parameters.Fc7Width).W))    //Function-7 Port
 
     val o_pc  = Output(UInt((params.Parameters.AddrWidth).W))   //Program Counter (PC)
     val i_jal = Input( UInt(2.W))                               //Jump and Link Flag
