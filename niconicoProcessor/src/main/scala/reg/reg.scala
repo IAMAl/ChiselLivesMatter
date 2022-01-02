@@ -24,27 +24,31 @@ class REG extends Module {
 
     //Pipeline Registers
     val exe     = RegInit(Bool(), false.B)                      //Exec Validation
-    val rs1     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Source-1
-    val rs2     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile SOurce-2
+    val rs1     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Val. for Source-1
+    val rs2     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Val. for Source-2
     val opcode  = Reg(UInt((params.Parameters.OpcWidth).W))     //Opcode
 
     val imm     = Reg(UInt((params.Parameters.ImmWidth+1).W))   //Immediate
     val rn1     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for Source-1
-    val rn2     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for SOurce-2
+    val rn2     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for Source-2
     val fc3     = Reg(UInt((params.Parameters.Fc3Width).W))     //Func3
     val fc7     = Reg(UInt((params.Parameters.Fc7Width).W))     //Func7
+
+    val alu     = Reg(Bool())                                   //Destination
+    val lsu     = Reg(Bool())                                   //Destination
+    val bru     = Reg(Bool())                                   //Destination
 
 
     /* Assign                       */
     //Immediate's Pre-Formatting
-    when (io.i_opc === (params.Parameters.OP_STORE).U) {      //Store
+    when (io.i_opc === (params.Parameters.OP_STORE).U) {        //Store
         imm := Cat(io.i_fc7, io.i_wno)
     }
-    .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {  //Load
+    .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {    //Load
         imm := Cat(io.i_fc7, io.i_rn2)
     }
-    .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) { //Branch/Jump
-        imm := Cat(io.i_fc7(6), io.i_wno(0), io.i_fc7(5,0), io.i_wno(4, 1)) << 1.U
+    .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) {   //Branch/Jump
+        imm := Cat(io.i_fc7(6), Cat(io.i_wno(0), Cat(io.i_fc7(5,0), Cat(io.i_wno(4, 1), 0.U.asTypeOf(UInt(1.W))))))
     }
 
     //Write Data
@@ -74,9 +78,9 @@ class REG extends Module {
             //Read Register File
             rs2 := RF(io.i_rn2)
         }
-        .otherwise {
-            //Output Immediate
-            rs2 := io.i_fc7
+        .otherwise{
+            //Set Immediate
+            rs2 := Cat(io.i_fc7, io.i_rn2)
         }
     }
 
@@ -100,10 +104,11 @@ class REG extends Module {
     io.o_fc7_o  := fc7
 
     //Arithmetic Source Operands
-    when ((io.i_opc === (params.Parameters.OP_RandI).U) || (io.i_opc === (params.Parameters.OP_RandR).U)) {
+    alu         := (io.i_opc === (params.Parameters.OP_RandI).U) || (io.i_opc === (params.Parameters.OP_RandR).U)
+    when (alu) {
         //Set Source Operands for
         // Source-1&2 are from RegisterFile
-        // SOurce-1 is from RegisterFile
+        // Source-1 is from RegisterFile
         io.o_as1    := rs1
         io.o_as2    := rs2
     }
@@ -114,7 +119,8 @@ class REG extends Module {
     }
 
     //Load/Store Source Operands
-    when ((io.i_opc === (params.Parameters.OP_STORE).U) || (io.i_opc === (params.Parameters.OP_LOAD).U)) {
+    lsu         := (io.i_opc === (params.Parameters.OP_STORE).U) || (io.i_opc === (params.Parameters.OP_LOAD).U)
+    when (lsu) {
         //Set Load/Store Reference Data
         io.o_ls1    := rs1
         io.o_ls2    := rs2
@@ -126,7 +132,8 @@ class REG extends Module {
     }
 
     //Branch Source Operands
-    when (io.i_opc === (params.Parameters.OP_BRJMP).U) {
+    bru         := (io.i_opc === (params.Parameters.OP_BRJMP).U)
+    when (bru) {
         //Set Branch Reference Value
         io.o_bs1    := rs1
         io.o_bs2    := rs2

@@ -29,6 +29,12 @@ class BRU extends Module {
     //Link Register
     val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
 
+<<<<<<< HEAD
+=======
+    // Branch Condition
+    val BC      = RegInit(Bool(), false.B)
+
+>>>>>>> dc31a2e021a9e3b842c0209894201e82fdf88dd0
 
     /* Wire                         */
     //Brach Condition
@@ -40,11 +46,9 @@ class BRU extends Module {
     //Jump Address
     val jmp     = Wire(SInt((params.Parameters.AddrWidth).W))
 
-    //Immediate to Jump/Branch
-    val imm     = Wire(SInt((params.Parameters.AddrWidth).W))
-
 
     /* Assign                       */
+<<<<<<< HEAD
     //Jump-Immediate Composition
     imm     := io.i_imm
     when (io.i_jal === JAL) {
@@ -58,24 +62,32 @@ class BRU extends Module {
     .otherwise {
         jmp := 0.S
     }
+=======
+    //Jump and Link
+    jmp := io.i_imm
+>>>>>>> dc31a2e021a9e3b842c0209894201e82fdf88dd0
 
-    PC_in   := PC.asUInt
+    PC_in   := PC
     BRC     := DontCare
     when (io.i_vld) {
         //Program Counter and Link
         when (io.i_jal === JAL) {
             //Jump and Link
+<<<<<<< HEAD
             PC  := Cat(jmp, 0.S.asTypeOf(SInt(1.W))).asUInt
+=======
+            PC  := jmp
+>>>>>>> dc31a2e021a9e3b842c0209894201e82fdf88dd0
             LNK := PC + 4.U
         }
         .elsewhen (io.i_jal === JALR) {
             //Jump and Link Register
-            PC  := io.i_rs1 + jmp.asUInt
+            PC  := io.i_rs1 + jmp.asSInt
             LNK := PC + 4.U
         }
         .elsewhen (BRC && (io.i_jal === 0.U)) {
             //Branch Taken
-            PC  := PC_in + io.i_imm.asUInt
+            PC  := PC_in + io.i_imm.asSInt
         }
         .elsewhen (!BRC && (io.i_jal === 0.U)) {
             //Branch NOT Taken
@@ -86,27 +98,27 @@ class BRU extends Module {
         switch(io.i_fc3) {
             is((params.Parameters.FC3_BEQ).U) {
                 //Equal (Signed)
-                BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BNE).U) {
                 //Not Equal (Signed)
-                BRC    := (io.i_rs1.asSInt =/= io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt =/= io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BLT).U) {
                 //Less Than (Signed)
-                BRC    := (io.i_rs1.asSInt <   io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt <   io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BGE).U) {
                 //Greater Than or Equal (Signed)
-                BRC    := (io.i_rs1.asSInt >=  io.i_rs2.asSInt).asBool
+                BRC    := (io.i_rs1.asSInt >=  io.i_rs2.asSInt)
             }
             is((params.Parameters.FC3_BLTU).U) {
                 //Less Than (Unsigned)
-                BRC    := (io.i_rs1 <  io.i_rs2).asBool
+                BRC    := (io.i_rs1 <  io.i_rs2)
             }
             is((params.Parameters.FC3_BGEU).U) {
                 //Greater Than or Equal (Unsigned)
-                BRC    := (io.i_rs1 >= io.i_rs2).asBool
+                BRC    := (io.i_rs1 >= io.i_rs2)
             }
         }
     }
@@ -114,7 +126,8 @@ class BRU extends Module {
 
     /* Output                       */
     //Branch Condition
-    io.o_brc    := BRC
+    BC          := BRC
+    io.o_brc    := BC
 
     //Program Counter Value
     io.o_pc     := PC

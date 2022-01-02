@@ -13,7 +13,7 @@ class URT extends Module {
     /* I/O                          */
     val io = IO(new Bundle {
         val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
-        val o_UnitID    = Output(UInt(3.W))
+        val o_UID       = Output(UInt(3.W))
         val o_EnWB      = Output(Bool())
         val o_is_ALU    = Output(Bool())
         val o_is_LSU    = Output(Bool())
@@ -51,7 +51,7 @@ class URT extends Module {
     }
 
     //Output
-    io.o_UnitID := UnitID
+    io.o_UID    := UnitID
     io.o_EnWB   := EnWB
 
     is_ALU      := (UnitID === (params.Parameters.OP_RandI).U) || (UnitID === (params.Parameters.OP_RandR).U)
