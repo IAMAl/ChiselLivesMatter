@@ -86,8 +86,6 @@ class NicoNico extends Module {
     //Branch Unit
     BRU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_BRU  //Validate BRU
     BRU.io.i_jal  	:= REG.io.o_opcode(3, 2)  //Opcode
-    BRU.io.i_fc3  	:= REG.io.o_fc3	//Func3 Value
-    BRU.io.i_fc7  	:= REG.io.o_fc7 //Func7 Value
     BRU.io.i_rs1  	:= REG.io.o_bs1 //Operand Data Word-1
     BRU.io.i_rs2  	:= REG.io.o_bs2 //Operand Data Word-2
     BRU.io.i_imm  	:= REG.io.o_imm //Immediate Value
