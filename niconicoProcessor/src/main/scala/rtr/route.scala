@@ -10,6 +10,7 @@ import params._
 
 class URT extends Module {
 
+
     /* I/O                          */
     val io = IO(new Bundle {
         val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
@@ -19,6 +20,7 @@ class URT extends Module {
         val o_is_LSU    = Output(Bool())
         val o_is_BRU    = Output(Bool())
     })
+
 
     /* Module                       */
     //Opcode Bit-Field Extraction

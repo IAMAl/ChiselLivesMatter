@@ -11,7 +11,7 @@ import params._
 class ISA_ILEncode extends Module {
 
 
-     /* I/O                          */
+     /* I/O                         */
     val io = IO(new Bundle {
         //Opcode
         val i_ilenc     = Input( UInt((params.Parameters.ILEnc).W))
@@ -27,7 +27,7 @@ class ISA_ILEncode extends Module {
 class ISA_Opcode extends Module {
 
 
-     /* I/O                          */
+     /* I/O                         */
     val io = IO(new Bundle {
         //Opcode
         val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
@@ -43,7 +43,7 @@ class ISA_Opcode extends Module {
 class ISA_fc3_lsu extends Module {
 
 
-     /* I/O                          */
+     /* I/O                         */
     val io = IO(new Bundle {
         val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))
         val o_LSType    = Output(UInt((params.Parameters.Fc3Width-1).W))

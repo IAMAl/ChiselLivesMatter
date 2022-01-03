@@ -155,9 +155,9 @@ class SCH extends Module {
     }
 
 
-    /* Hazard Detection         */
+    /* Hazard Detection             */
     //Write-After-Write
-    WAWDst(0)   := (RegWNo(0) === ISplit.io.o_wno)  && RegVld(0) && !ImmDst(0)
+    WAWDst(0)   := (RegWNo(0) === ISplit.io.o_wno) && RegVld(0) && !ImmDst(0)
     WAWDst(1)   := (RegWNo(1) === RegWNo(0)) && RegVld(1) && !ImmDst(1)
     WAWDst(2)   := (RegWNo(2) === RegWNo(0)) && RegVld(2) && !ImmDst(2)
     WAWDst(3)   := (RegWNo(3) === RegWNo(0)) && RegVld(3)
@@ -181,10 +181,10 @@ class SCH extends Module {
     RAWSr2(2)   := (RegRN2(2) === RegWNo(2)) && RegVld(2) && !ImmSrc(2)
 
     //Load Hazard Detection
-    RAWMem      := (RegRN1(0) === RegWNo(3))
+    RAWMem      := (RegRN1(0) === RegWNo(3)) || (RegRN2(0) === RegWNo(3))
 
 
-    /* Stall Detection          */
+    /* Stall Detection              */
     //Write-After-Write Hazard Detection
     //WAW between preceding load and follower destinations
     WAW_Hzd     := (WAWDst.asUInt =/= 0.U)

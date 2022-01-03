@@ -64,11 +64,7 @@ class BRU extends Module {
         //Program Counter and Link
         when (io.i_jal === JAL) {
             //Jump and Link
-<<<<<<< HEAD
             PC  := Cat(jmp, 0.S.asTypeOf(SInt(1.W))).asUInt
-=======
-            PC  := jmp
->>>>>>> dc31a2e021a9e3b842c0209894201e82fdf88dd0
             LNK := PC + 4.U
         }
         .elsewhen (io.i_jal === JALR) {

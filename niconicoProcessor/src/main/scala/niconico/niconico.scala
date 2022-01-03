@@ -17,7 +17,7 @@ import lsu._
 class NicoNico extends Module {
 
 
-    /* I/O                    		*/
+    /* I/O                    		  */
     val io = IO(new NICO2_IO)
 
 
@@ -36,7 +36,7 @@ class NicoNico extends Module {
     /* Assign                       */
     //Stage-1
     //Instruction Fetch
-    FCH.io.i_boot 	:= io.boot		//Kick-Start(High-Active)
+    FCH.io.i_boot 	:= io.boot		  //Kick-Start(High-Active)
     FCH.io.i_ifch 	:= io.inst      //Input 32b Word Instruction
     FCH.io.i_brc  	:= BRU.io.o_brc //Flush by Branch Taken
     FCH.io.i_stall	:= SCH.io.o_cnd //Branch Unit is Active (so stall)
@@ -68,7 +68,7 @@ class NicoNico extends Module {
 
     //Stage-4
     //Arithmetic/Logic Unit
-    ALU.io.i_UID	:= URT.io.o_UID	//Executing Datapath ID
+    ALU.io.i_UID	:= URT.io.o_UID	  //Executing Datapath ID
     ALU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_ALU  //Validate ALU
     ALU.io.i_fc3  	:= REG.io.o_fc3	//Func3 Value
     ALU.io.i_fc7  	:= REG.io.o_fc7	//Func7 Value

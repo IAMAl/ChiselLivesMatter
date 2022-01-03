@@ -11,11 +11,11 @@ import params._
 class ISplit extends Module {
 
 
-    /* I/O                      */
+    /* I/O                          */
     val io = IO(new ISplit_IO)
 
 
-    /* Register                 */
+    /* Register                     */
     //Captures Bit-Fields in Instruction
     val opc = Reg(UInt((params.Parameters.OpcWidth).W))
     val wno = Reg(UInt((params.Parameters.LogNumReg).W))
@@ -25,7 +25,7 @@ class ISplit extends Module {
     val fc7 = Reg(UInt((params.Parameters.Fc7Width).W))
 
 
-    /* Assign                   */
+    /* Assign                       */
     //Bit-Field Extraction
     opc := io.i_ins(params.Parameters.MSB_Opc, params.Parameters.LSB_Opc)
     wno := io.i_ins(params.Parameters.MSB_Dst, params.Parameters.LSB_Dst)
