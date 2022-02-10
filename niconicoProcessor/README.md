@@ -2,6 +2,8 @@
 
 ## RISC-V Microprocessor
 
+![RV32I](RV32I.png)
+
 ### Features
 - **Baseline** RISC-V ISA (RV32I).
 - In-Order Execution.
