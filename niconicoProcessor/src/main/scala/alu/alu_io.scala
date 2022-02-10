@@ -7,7 +7,7 @@ import chisel3.util._
 
 import params._
 
-class ALU_IO extends Bundle {   
+class ALU_IO extends Bundle {
     val i_vld = Input( Bool())                                  //ALU Operation Validation
     val i_rs1 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-1 Port
     val i_rs2 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-2 Port

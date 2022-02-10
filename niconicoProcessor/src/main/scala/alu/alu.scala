@@ -18,6 +18,8 @@ class ALU extends Module {
         val i_imm       = Input( UInt((params.Parameters.DatWidth).W))  // Immediate
         val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))  // Immediate (Func3)
         val i_fc7       = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
+        val i_wrn       = Input( UInt(LogNumReg.W))                     // Write-Back Index
+        val o_wrn       = Output(UInt(LogNumReg.W))                     // Write-Back Index
         val o_dst       = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
         val o_wrb       = Output(Bool())                                // Writeback Request
         val i_UnitID    = Input( UInt(3.W))                             // Operation Unit ID
@@ -28,11 +30,6 @@ class ALU extends Module {
     val Add     = Module(new Add)           //Adder
     val Lgc     = Module(new Lgc)           //Logic
     val Sft     = Module(new Sft)           //Shifter
-
-
-    /* Register                             */
-    val vld     = RegInit(Bool(), false.B)
-    val dst     = Reg(UInt((params.Parameters.DatWidth).W))
 
 
     /* Assign                               */
@@ -61,11 +58,11 @@ class ALU extends Module {
     Sft.io.i_imm    := 0.U
 
     //Output
-    vld         := io.i_vld
-    io.o_wrb    := vld
+    io.o_wrb        := io.i_vld
 
-    //ORed 
+    //ORed
     //Exclusive-Output by NOP
-    dst         := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
-    io.o_dst    := dst
+    io.o_dst        := Add.io.o_dst | Lgc.io.o_dst | Sft.io.o_dst
+
+    io.o_wrn       := io.i_wrn
 }

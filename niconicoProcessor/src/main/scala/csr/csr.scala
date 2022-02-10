@@ -15,14 +15,12 @@ class Csr extends Module {
 
     /* Register                         */
     //Register File
-    val exe     = RegInit(Bool(), false.B)                      //Exec Validation
     val CSR     = RegInit(0.U.asTypeOf(Vec(2, Vec(NumReg, Vec(NumReg, UInt((params.Parameters.DatWidth).W)))))
 
 
      /* Wire                             */
-    val csr     = Wire(UInt((params.Parameters.DatWidth).W))    //Immediate
-    val imm     = Wire(UInt((params.Parameters.DatWidth).W))    //Immediate
-    val imm_z   = Wire(UInt(5.W))                               //Index
+    val csr     = Wire(UInt((params.Parameters.DatWidth).W))    //CSR-Output
+    val imm_z   = Wire(UInt(5.W))                               //Immediate
     val idx     = Wire(UInt(12).W))                             //Index
 
 
@@ -51,13 +49,14 @@ class Csr extends Module {
             }
             is (FC3_CSRRW) {
                 CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr & ~imm_z
-            }     
+            }
         }
     }
 
-    io.o_dst:= csr
+    io.o_dst    := csr
 
-    exe     := io.i_vld
-    io.o_wrb:= exe
+    io.o_wrb    := io.i_vld
+
+    io.i_wrn    := io.i_wrn
 
 }

@@ -20,17 +20,9 @@ class BRU extends Module {
 
 
     /* Register                         */
-    //Write-back Flag
-    val WRB     = RegInit(Bool(), false.B)
-
     //Program Counter
     val PC      = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
 
-    //Link Register
-    val LNK     = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
-
-    // Branch Condition
-    val BC      = RegInit(Bool(), false.B)
 
     /* Wire                             */
     //Brach Condition
@@ -38,6 +30,9 @@ class BRU extends Module {
 
     //Jump Address
     val jmp     = Wire(SInt((params.Parameters.AddrWidth).W))
+
+    //Link
+    val LNK     = Wire(UInt(params.Parameters.AddrWidth).W)
 
 
     /* Assign                           */
@@ -110,16 +105,16 @@ class BRU extends Module {
 
     /* Output                           */
     //Branch Condition
-    BC          := BRC
-    io.o_brc    := BC
+    io.o_brc    := BRC
 
     //Program Counter Value
     io.o_pc     := PC
 
     //Write-back Request
-    WRB         := ((io.i_jal === JAL) || (io.i_jal === JALR)) && io.i_vld
-    io.o_wrb    := WRB
+    io.o_wrb    := ((io.i_jal === JAL) || (io.i_jal === JALR)) && io.i_vld
 
     //Link Value
     io.o_dst    := LNK
+
+    io.o_wrn    := io.i_wrn
 }

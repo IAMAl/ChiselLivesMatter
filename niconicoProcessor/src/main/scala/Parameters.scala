@@ -166,4 +166,7 @@ object Parameters {
     val ST_OFFSET0_MSb  = 11
     val ST_OFFSET1_LSb  = 25
     val ST_OFFSET1_MSb  = 31
+
+    //ROB
+    val BUFFLENGTH      = 4
 }

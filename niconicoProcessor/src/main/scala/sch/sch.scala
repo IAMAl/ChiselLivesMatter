@@ -61,21 +61,14 @@ class SCH extends Module {
     val WARSr1      = Wire(Vec(3, Bool()))
     val WARSr2      = Wire(Vec(3, Bool()))
 
-    //Read-After-Write (RAW) Hazard
-    val RAWSr1      = Wire(Vec(3, Bool()))
-    val RAWSr2      = Wire(Vec(3, Bool()))
-    val RAWMem      = Wire(Bool())
-
     //Hazard Detector
     val WAW_Hzd     = Wire(Bool())
     val WAR_RS1     = Wire(Bool())
     val WAR_RS2     = Wire(Bool())
-    val RAW_Hzd     = Wire(Bool())
 
     //Stall Generation
     val Stall       = Wire(Bool())
     val StallWrite  = Wire(Bool())
-    val StallRead   = Wire(Bool())
     val StallBranch = Wire(Bool())
 
     //Immediate Value
@@ -176,18 +169,6 @@ class SCH extends Module {
     WARSr2(1)   := (RegRN2(1) === RegWNo(0))
     WARSr2(2)   := (RegRN2(2) === RegWNo(0))
 
-    //Structural Hazard Detection
-    RAWSr1(0)   := (RegRN1(0) === RegWNo(2)) && RegVld(0)
-    RAWSr1(1)   := (RegRN1(1) === RegWNo(2)) && RegVld(1)
-    RAWSr1(2)   := (RegRN1(2) === RegWNo(2)) && RegVld(2)
-
-    RAWSr2(0)   := (RegRN2(0) === RegWNo(2)) && RegVld(0) && !ImmSrc(0)
-    RAWSr2(1)   := (RegRN2(1) === RegWNo(2)) && RegVld(1) && !ImmSrc(1)
-    RAWSr2(2)   := (RegRN2(2) === RegWNo(2)) && RegVld(2) && !ImmSrc(2)
-
-    //Load Hazard Detection
-    RAWMem      := (RegRN1(0) === RegWNo(3)) || (RegRN2(0) === RegWNo(3))
-
 
     /* Stall Detection                  */
     //Write-After-Write Hazard Detection
@@ -198,21 +179,14 @@ class SCH extends Module {
     WAR_RS1     := (WARSr1.asUInt =/= 0.U)
     WAR_RS2     := (WARSr2.asUInt =/= 0.U)
 
-    //Read-After-Write Hazard Detection
-    RAW_Hzd     := (RAWSr1.asUInt =/= 0.U) || (RAWSr2.asUInt =/= 0.U) || RAWMem
-
     //Register-Write Stall
     StallWrite  := WAR_RS1 || WAR_RS2 || WAW_Hzd
-
-    //Register-Read Stall
-    StallRead   := RAW_Hzd
 
     //Stall by JAL Write-back
     StallBranch := CndDst
 
     //Stall
-    Stall       := StallWrite || StallRead || StallBranch
-
+    Stall       := StallWrite || StallBranch
 
     //Output
     when (io.i_vld && !Stall) {
@@ -229,12 +203,8 @@ class SCH extends Module {
     io.o_fc7    := RegFc7
 
     io.o_wed    := !StallWrite
-    io.o_re1    := !StallRead && !StallBranch && RegVld(0)
-    io.o_re2    := !StallRead && !StallBranch && RegVld(0)
-
-    //Bypassing from Write-Back Stage to Exe Stage
-    io.o_by1    := RAWSr1(1)
-    io.o_by2    := RAWSr2(1)
+    io.o_re1    := !StallBranch && RegVld(0)
+    io.o_re2    := !StallBranch && RegVld(0)
 
     //Validate Next Stage
     io.o_exe    := RegVld(0)

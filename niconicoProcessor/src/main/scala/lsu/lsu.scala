@@ -76,11 +76,11 @@ class LSU extends Module {
     val mar     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Address Register (MAR)
     val mdr     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Data Register (MDR)
     val LdDone  = RegInit(Bool(), false.B)                  //
+    val wrn     = Reg(UInt((params.Parameters.LogNumReg).W))//
 
 
     /* Wire                             */
     val is_Ld   = Wire(Bool())                              //Load  Instruction Flag
-    val is_IMM  = Wire(Bool())                              //Load  Immediate Flag
     val is_St   = Wire(Bool())                              //Store Instruction Flag
     val dat     = Wire(UInt((params.Parameters.DatWidth).W))//Load Data
     val msk     = Wire(SInt((params.Parameters.DatWidth).W))//Access Mask
@@ -187,10 +187,16 @@ class LSU extends Module {
 
         msk := 0x00000000.S
     }
+
+    when (io.i_vld) {
+        wrn := io.i_wrn
+    }
+
     io.o_dreq   := LdReq.io.Req
     io.o_stor   := is_St
     io.o_dmar   := mar
     io.o_dst    := mdr
     io.o_odat   := mdr
+    io.o_wrn    := wrn
     io.o_wrb    := LdDone
 }

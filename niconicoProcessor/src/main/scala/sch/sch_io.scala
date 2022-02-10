@@ -18,9 +18,6 @@ class SCH_IO extends Bundle {
     val o_fc3 = Output(UInt((params.Parameters.Fc3Width).W))    //Function-3 Port
     val o_fc7 = Output(UInt((params.Parameters.Fc7Width).W))    //Function-7 Port
 
-    val o_by1 = Output(Bool())                                  //Bypass Control-1
-    val o_by2 = Output(Bool())                                  //Bypass Control-2
-
     val o_re1 = Output(Bool())                                  //Register Read Enable-1
     val o_re2 = Output(Bool())                                  //Register Read Enable-2
     val o_wed = Output(Bool())                                  //Register Write Enable

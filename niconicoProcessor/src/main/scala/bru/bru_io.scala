@@ -12,10 +12,12 @@ class BRU_IO extends Bundle {
     val i_rs1 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-1 Port
     val i_rs2 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-2 Port
 
-    val o_pc  = Output(UInt((params.Parameters.AddrWidth).W))   //Program Counter (PC)
     val i_jal = Input( UInt(2.W))                               //Jump and Link Flag
     val i_imm = Input( UInt((params.Parameters.DatWidth).W))    //Immediate Port
+    val i_wrn = Input( UInt(LogNumReg.W))                       // Write-Back Index
+    val o_wrn = Output(UInt(LogNumReg.W))                       // Write-Back Index
     val o_brc = Output(Bool())                                  //Branch Taken
     val o_wrb = Output(Bool())                                  //Write-back
     val o_dst = Output(UInt((params.Parameters.AddrWidth).W))   //Link Address
+    val o_pc  = Output(UInt((params.Parameters.AddrWidth).W))   //Program Counter (PC)
 }

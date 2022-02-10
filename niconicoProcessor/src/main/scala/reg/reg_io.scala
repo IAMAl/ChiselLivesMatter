@@ -38,7 +38,6 @@ class REG_IO extends Bundle {
     val o_as2   = Output(UInt((params.Parameters.DatWidth).W))      //ALU Operand-2 Port
     val o_ls1   = Output(UInt((params.Parameters.DatWidth).W))      //LSU Operand-1 Port
     val o_ls2   = Output(UInt((params.Parameters.DatWidth).W))      //LSU Operand-2 Port
-    val o_bs1   = Output(UInt((params.Parameters.DatWidth).W))      //BRJ Operand-1 Port
     val o_bs2   = Output(UInt((params.Parameters.DatWidth).W))      //BRJ Operand-2 Port
 
     val o_opcode= Output(UInt((params.Parameters.OpcWidth).W))      //Opcode
