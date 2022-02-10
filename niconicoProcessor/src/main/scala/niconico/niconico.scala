@@ -31,12 +31,13 @@ class NicoNico extends Module {
     val ALU = Module(new ALU)     		//Arithmetic/Logic Unit
     val LSU = Module(new LSU)     		//Load/Store Unit
     val BRU = Module(new BRU)     		//Branch Unit
+    val CSU = Module(new CSU)         	//Control Status Register
 
 
     /* Assign                       	*/
     //Stage-1
     //Instruction Fetch
-    FCH.io.i_boot 	:= io.boot			//Kick-Start (High-Active)
+    FCH.io.i_boot	:= io.boot			//Kick-Start (High-Active)
     FCH.io.i_ifch 	:= io.inst      	//Input 32b Word Instruction
     FCH.io.i_brc  	:= BRU.io.o_brc 	//Flush by Branch Taken
     FCH.io.i_stall	:= SCH.io.o_hzd 	//Stall by Hazard
@@ -67,6 +68,11 @@ class NicoNico extends Module {
 
 
     //Stage-4
+    //Control Status Register
+    CSU.io.i_vld	:= REG.io.o_exe && URT.io.o_is_CSU  //Validate CSU
+    CSU.io.i_rs1	:= REG.io.o_as1
+    CSU.io.i_imm	:= REG.io.o_imm
+    
     //Arithmetic/Logic Unit
     ALU.io.i_UID	:= URT.io.o_UID		//Executing Datapath ID
     ALU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_ALU  //Validate ALU
@@ -94,15 +100,13 @@ class NicoNico extends Module {
     //Stage-5
     //Write-Back
     REG.io.i_wed  	:= SCH.io.o_wed 	//Write-enable
-    REG.io.i_wrb_r	:= ALU.io.o_wrb || LSU.io.o_wrb || BRU.io.o_wrb
-    REG.io.i_wrb_d	:= ALU.io.o_dst |  LSU.io.o_dst |  BRU.io.o_dst
-
+    REG.io.i_wrb_r	:= ALU.io.o_wrb || LSU.io.o_wrb || BRU.io.o_wrb || CSU.io.o_wrt
+    REG.io.i_wrb_d	:= ALU.io.o_dst |  LSU.io.o_dst |  BRU.io.o_dst |  CSU.io.o_dst
 
     //Instruction Memory Interface
     io.iadr       	:= BRU.io.o_pc		//Program Counter
     io.ireq       	:= FCH.io.o_ireq	//Instr. Fetch Req.
     FCH.io.i_iack 	:= io.iack      	//Instr. Fetch Ack.
-
 
     //Data Memory Interface
     io.dreq       	:= LSU.io.o_dreq	//Data Memory Access Req.

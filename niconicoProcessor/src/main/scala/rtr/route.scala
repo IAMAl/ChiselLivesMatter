@@ -14,8 +14,10 @@ class URT extends Module {
     /* I/O                              */
     val io = IO(new Bundle {
         val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
+        val i_fc3       = Input( UInt(3.W))
         val o_UID       = Output(UInt(3.W))
         val o_EnWB      = Output(Bool())
+        val o_is_CSU    = Output(Bool())
         val o_is_ALU    = Output(Bool())
         val o_is_LSU    = Output(Bool())
         val o_is_BRU    = Output(Bool())
@@ -29,6 +31,7 @@ class URT extends Module {
 
     /* Register                         */
     val UnitID  = Reg(UInt(3.W))
+    val is_CSU  = Reg(Bool())
     val is_ALU  = Reg(Bool())
     val is_LSU  = Reg(Bool())
     val is_BRU  = Reg(Bool())
@@ -45,7 +48,8 @@ class URT extends Module {
     when (  (UnitID === (params.Parameters.OP_RandI).U) || 
             (UnitID === (params.Parameters.OP_RandR).U) || 
             (UnitID === (params.Parameters.OP_LOAD).U)  ||
-            (UnitID === (params.Parameters.OP_JAL).U)
+            (UnitID === (params.Parameters.OP_JAL).U)   ||
+            (UnitID === (params.Parameters.OP_CSR).U)
             ) {
         EnWB    := true.B
     }
@@ -57,12 +61,15 @@ class URT extends Module {
     io.o_UID    := UnitID
     io.o_EnWB   := EnWB
 
+    is_CSU      := (UnitID === (params.Parameters.OP_CSR).U) && (io.i_fc3 === (params.Parameters.FS3_CSR))
+    io.o_is_CSU := is_CSU
+
     is_ALU      := (UnitID === (params.Parameters.OP_RandI).U) || (UnitID === (params.Parameters.OP_RandR).U)
     io.o_is_ALU := is_ALU
 
     is_LSU      := (UnitID === (params.Parameters.OP_LOAD).U)  || (UnitID === (params.Parameters.OP_STORE).U)
     io.o_is_LSU := is_LSU
 
-    is_BRU      := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U)
+    is_BRU      := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U) && (io.i_fc3 =/= (params.Parameters.FS3_CSR))
     io.o_is_BRU := is_BRU
 }
