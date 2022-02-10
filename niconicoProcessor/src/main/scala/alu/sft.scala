@@ -11,21 +11,23 @@ import isa._
 class Sft extends Module {
 
 
-    /* I/O                          */
+    val LogDWidth   := params.Parameters.LogDWidth
+
+    /* I/O                                  */
     val io = IO(new ALU_IO)
 
 
-    /* Assign                       */
+    /* Assign                               */
     when (io.i_vld) {
         when (io.i_fc3 === (params.Parameters.FC3_SR).U) {
             when (io.i_fc7 === (params.Parameters.FC7_ART).U) {
                 //Arithmetic Right Shift
                 //Signed Integer makes Sign-fill
-                io.o_dst    := (io.i_rs1.asSInt >>> io.i_rs2(4, 0)).asUInt
+                io.o_dst    := (io.i_rs1.asSInt >> io.i_rs2(LogDWidth-1, 0)).asUInt
             }
             .elsewhen (io.i_fc7 === (params.Parameters.FC7_LGC).U) {
                 //Logical Right Shift
-                io.o_dst    := io.i_rs1 >> io.i_rs2(4, 0)
+                io.o_dst    := io.i_rs1 >> io.i_rs2(LogDWidth-1, 0)
             }
             .otherwise {
                 //NOP
@@ -34,7 +36,7 @@ class Sft extends Module {
         }
         .elsewhen (io.i_fc3 === (params.Parameters.FC3_SL).U) {
             //Logical Left Shift
-            io.o_dst    := io.i_rs1 << io.i_rs2(4, 0)
+            io.o_dst    := io.i_rs1 << io.i_rs2(LogDWidth-1, 0)
         }
         .otherwise {
             //NOP

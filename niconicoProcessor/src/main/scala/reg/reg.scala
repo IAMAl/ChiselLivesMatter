@@ -14,11 +14,11 @@ class REG extends Module {
     val NumReg      = params.Parameters.NumReg
 
 
-    /* I/O                          */
+    /* I/O                              */
     val io = IO(new REG_IO)
 
 
-    /* Register                     */
+    /* Register                         */
     //Register File
     val RF      = RegInit(0.U.asTypeOf(Vec(NumReg, UInt((params.Parameters.DatWidth).W))))
 
@@ -26,9 +26,9 @@ class REG extends Module {
     val exe     = RegInit(Bool(), false.B)                      //Exec Validation
     val rs1     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Val. for Source-1
     val rs2     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Val. for Source-2
+    val r_imm   = Reg(UInt((params.Parameters.DatWidth).W))     //Immediate
     val opcode  = Reg(UInt((params.Parameters.OpcWidth).W))     //Opcode
 
-    val imm     = Reg(UInt((params.Parameters.ImmWidth+1).W))   //Immediate
     val rn1     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for Source-1
     val rn2     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for Source-2
     val fc3     = Reg(UInt((params.Parameters.Fc3Width).W))     //Func3
@@ -39,16 +39,26 @@ class REG extends Module {
     val bru     = Reg(Bool())                                   //Destination
 
 
-    /* Assign                       */
-    //Immediate's Pre-Formatting
+    /* Wire                             */
+    val imm     = Wire(UInt((params.Parameters.DatWidth).W))    //Immediate
+
+
+    /* Assign                           */
+    //Signed Immediate's Pre-Formatting
     when (io.i_opc === (params.Parameters.OP_STORE).U) {        //Store
-        imm := Cat(io.i_fc7, io.i_wno)
+        imm := Cat(Fill(20.U, io.i_fc7(6)), Cat(io.i_fc7, io.i_wno))
     }
     .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {    //Load
-        imm := Cat(io.i_fc7, io.i_rn2)
+        imm := Cat(Fill(20.U, io.i_fc7(6)), Cat(io.i_fc7, io.i_rn2))
     }
     .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) {   //Branch/Jump
-        imm := Cat(io.i_fc7(6), Cat(io.i_wno(0), Cat(io.i_fc7(5,0), Cat(io.i_wno(4, 1), 0.U.asTypeOf(UInt(1.W))))))
+        imm := Cat(Fill(19.U, io.i_fc7(6)), Cat(io.i_fc7(6), Cat(io.i_wno(0), Cat(io.i_fc7(5,0), Cat(io.i_wno(4, 1), 0.U.asTypeOf(UInt(1.W)))))))
+    }
+    .elsewhen (io.i_opc === (params.Parameters.OP_UI).U) {      //LUI/AUIPC
+        imm := Cat(Fill(11.U, io.i_fc7(6)), Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, Cat(io.i_fc3, 0.U.asTypeOf(UInt(12.W)))))))
+    }
+    .otherwise {
+        imm := 0.U
     }
 
     //Write Data
@@ -66,6 +76,10 @@ class REG extends Module {
             //Read Register File
             rs1 := RF(io.i_rn1)
         }
+        .elsewhen (fc3 == (params.Parameters.FC3_AUIPC).U) {
+            //AUIPC
+            rs1 := io.i_pc
+        }
     }
 
     //Read Source-2
@@ -78,11 +92,12 @@ class REG extends Module {
             //Read Register File
             rs2 := RF(io.i_rn2)
         }
-        .otherwise{
+        .otherwise {
             //Set Immediate
-            rs2 := Cat(io.i_fc7, io.i_rn2)
+            rs2 := imm
         }
     }
+    r_imm   := imm
 
     //Output to Follower Pipeline Stage
     exe         := io.i_vld //Exec Validation
@@ -109,7 +124,10 @@ class REG extends Module {
         //Set Source Operands for
         // Source-1&2 are from RegisterFile
         // Source-1 is from RegisterFile
-        io.o_as1    := rs1
+
+        .otherwise {
+            io.o_as1    := rs1
+        }
         io.o_as2    := rs2
     }
     .otherwise {
@@ -144,6 +162,6 @@ class REG extends Module {
         io.o_bs2    := 0.U
     }
 
-    //Set Immediate Value
-    io.o_imm    := imm
+    //Immediate
+    io.o_imm    := r_imm
 }

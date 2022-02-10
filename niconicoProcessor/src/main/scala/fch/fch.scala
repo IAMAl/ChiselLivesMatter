@@ -12,16 +12,16 @@ import lsu._
 class FCH extends Module {
 
 
-    /* I/O                          */
+    /* I/O                              */
     val io  = IO(new FCH_IO)
 
 
-    /* Module                       */
+    /* Module                           */
     //Load Request Controller
     val LdReq   = Module(new LdReq)
 
 
-    /* Register                     */
+    /* Register                         */
     //Execution Enable on Next Pipeline Stage
     val exe     = RegInit(Bool(), false.B)
 
@@ -29,7 +29,7 @@ class FCH extends Module {
     val IR      = RegInit(UInt((params.Parameters.ISAWidth).W), 0.U)
 
 
-    /* Assign                       */
+    /* Assign                           */
     //Access Validation
     LdReq.io.LdReq    := io.i_boot
     LdReq.io.LdAck    := io.i_iack

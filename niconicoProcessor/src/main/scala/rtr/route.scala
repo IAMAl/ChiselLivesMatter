@@ -11,7 +11,7 @@ import params._
 class URT extends Module {
 
 
-    /* I/O                          */
+    /* I/O                              */
     val io = IO(new Bundle {
         val i_opc       = Input( UInt((params.Parameters.OpcWidth).W))
         val o_UID       = Output(UInt(3.W))
@@ -22,20 +22,21 @@ class URT extends Module {
     })
 
 
-    /* Module                       */
+    /* Module                           */
     //Opcode Bit-Field Extraction
     val ISA_Opcode  = Module(new ISA_Opcode)
 
 
-    /* Register                     */
+    /* Register                         */
     val UnitID  = Reg(UInt(3.W))
-    val EnWB    = Reg(Bool())
     val is_ALU  = Reg(Bool())
     val is_LSU  = Reg(Bool())
     val is_BRU  = Reg(Bool())
 
+    val EnWB    = RegInit(Bool(), false.B)
 
-    /* Assign                       */
+
+    /* Assign                           */
     //Routing (UnitID) Assignment and Write-Back Enable
     ISA_Opcode.io.i_opc := io.i_opc
     UnitID              := ISA_Opcode.io.o_OpcodeType

@@ -24,7 +24,7 @@ class SCH_IO extends Bundle {
     val o_re1 = Output(Bool())                                  //Register Read Enable-1
     val o_re2 = Output(Bool())                                  //Register Read Enable-2
     val o_wed = Output(Bool())                                  //Register Write Enable
-    val o_cnd = Output(Bool())                                  //Branch Unit is Active
+    val o_hzd = Output(Bool())                                  //Hazard
 
     val o_exe = Output(Bool())                                  //Execution Timing Flag
 }

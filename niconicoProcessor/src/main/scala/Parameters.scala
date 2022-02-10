@@ -11,13 +11,14 @@ object Parameters {
 
     //Instruction Bit-Field Width
     val ILEnc       = 2 
-    val OpcWidth    = 7
+    val OpcWidth    = 4
     val Fc3Width    = 3
     val Fc7Width    = 7
     val ImmWidth    = 12
 
     //Datapath Width
     val DatWidth    = 32
+    val LogDWidth   = log2Ceil(DatWidth)
 
     //Register File Size
     val NumReg      = 32
@@ -44,23 +45,23 @@ object Parameters {
     val OP_Type1_LSb= 4
     val OP_Type1_LSb= 6
 
-    val OP_BRJMP    = 0x6   //Branch/Jump
     val OP_LOAD     = 0x0   //Load
     val OP_STORE    = 0x2   //Store
     val OP_RandI    = 0x1   //Register and Immediate
     val OP_RandR    = 0x3   //Register and Register
-    val OP_JAL0     = 0x3   //Jump and Link
-    val OP_JAL1     = 0x3   //Jump and Link
-    val OP_JALR0    = 0x1   //Jump and Link Register
-    val OP_JALR1    = 0x6   //Jump and Link Register
+    val OP_BRJMP    = 0x4   //Branch/Jump
+    val OP_JALR     = 0x6   //Jump and Link Register
+    val OP_JAL      = 0x7   //Jump and Link
 
     //FC-3 Encode
     //Adder
     val FC3_ADD     = 0x0
+    val FC3_AUIPC   = 0x1   //AUIPC
+    val FC3_LUI     = 0x3   //LUI
 
     //Shifter
-    val FC3_SR      = 0x5
     val FC3_SL      = 0x1
+    val FC3_SR      = 0x5
 
     //Logic
     val FC3_XOR     = 0x4
@@ -156,5 +157,4 @@ object Parameters {
     val ST_OFFSET0_MSb  = 11
     val ST_OFFSET1_LSb  = 25
     val ST_OFFSET1_MSb  = 31
-
 }

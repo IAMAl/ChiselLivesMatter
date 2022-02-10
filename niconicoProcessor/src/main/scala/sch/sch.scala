@@ -11,15 +11,20 @@ import route._
 class SCH extends Module {
 
 
-    /* I/O                          */
+    val LSB_Opc := params.Parameters.LSB_Opc
+    val MSB_Opc := params.Parameters.MSB_Opc
+    val LSB_Fc3 := params.Parameters.LSB_Fc3
+    val MSB_Fc3 := params.Parameters.MSB_Fc3
+
+    /* I/O                              */
     val io = IO(new SCH_IO)
 
 
-    /* Module                       */
+    /* Module                           */
     val ISplit  = Module(new ISplit)
 
 
-    /* Register                     */
+    /* Register                         */
     //Value Holder
     val RegVld  = RegInit(false.B.asTypeOf(Vec(4, Bool())))
     val RegOpc  = RegInit(0.U.asTypeOf(UInt((params.Parameters.OpcWidth).W)))
@@ -39,7 +44,7 @@ class SCH extends Module {
     val CndDst  = RegInit(Bool(), false.B)
 
 
-    /* Wire                         */
+    /* Wire                             */
     //Value Holder
     val opc         = Wire(UInt((params.Parameters.OpcWidth).W))
     val wno         = Wire(UInt((params.Parameters.LogNumReg).W))
@@ -78,7 +83,7 @@ class SCH extends Module {
     val imm_LBA     = Wire(Bool())
 
 
-    /* Assign                       */
+    /* Assign                           */
     //Instruction Split
     ISplit.io.i_ins := io.i_ins
     opc     := ISplit.io.o_opc
@@ -91,7 +96,7 @@ class SCH extends Module {
 
     //Jump and Link (JAL) Handler
     when (RegCnd(2)) {
-        //Write-back and Clear
+        //Write-Back and Clear
         CndDst  := false.B
     }
     .elsewhen (opc === (params.Parameters.OP_JAL).U) {
@@ -99,14 +104,14 @@ class SCH extends Module {
         CndDst  := true.B
     }
 
-    //Writing at Store and or Branch
-    imm_SB      := ((opc(6, 4) === (params.Parameters.OP_STORE).U) ||
-                    (opc(6, 4) === (params.Parameters.OP_BRJMP).U))
+    //Reading Immediate (WN)at Store or Branch
+    imm_SB      := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_STORE).U) ||
+                    (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U))
 
-    //Reading at Link, Branch and or ALU
-    imm_LBA     := ((opc(6, 4) === (params.Parameters.OP_JAL).U)   ||
-                    (opc(6, 4) === (params.Parameters.OP_BRJMP).U) ||
-                    (opc(6, 4) === (params.Parameters.OP_RandI).U))
+    //Reading Immediate (RN1/RN2) at Link, Branch or ALU
+    imm_LBA     := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_JAL).U)   ||
+                    (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U) ||
+                    (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_RandI).U))
 
     //Register Read Stage
     RegVld(0)   := io.i_vld && !Stall
@@ -116,9 +121,9 @@ class SCH extends Module {
         RegRN1(0)   := rn1
         RegRN2(0)   := rn2
         RegWNo(0)   := wno
-        RegCnd(0)   := (opc(6, 4) === (params.Parameters.OP_JAL).U)  ||
-                       (opc(6, 4) === (params.Parameters.OP_BRJMP).U)
-        RegLd(0)    := (opc(6, 4) === (params.Parameters.OP_LOAD).U)
+        RegCnd(0)   := (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_JAL).U)  ||
+                       (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U)
+        RegLd(0)    := (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_LOAD).U)
     }
 
     //Execution Stage
@@ -155,7 +160,7 @@ class SCH extends Module {
     }
 
 
-    /* Hazard Detection             */
+    /* Hazard Detection                 */
     //Write-After-Write
     WAWDst(0)   := (RegWNo(0) === ISplit.io.o_wno) && RegVld(0) && !ImmDst(0)
     WAWDst(1)   := (RegWNo(1) === RegWNo(0)) && RegVld(1) && !ImmDst(1)
@@ -184,7 +189,7 @@ class SCH extends Module {
     RAWMem      := (RegRN1(0) === RegWNo(3)) || (RegRN2(0) === RegWNo(3))
 
 
-    /* Stall Detection              */
+    /* Stall Detection                  */
     //Write-After-Write Hazard Detection
     //WAW between preceding load and follower destinations
     WAW_Hzd     := (WAWDst.asUInt =/= 0.U)
@@ -235,5 +240,5 @@ class SCH extends Module {
     io.o_exe    := RegVld(0)
 
     //Active-flag for Branch Unit
-    io.o_cnd    := (RegCnd.asUInt =/= 0.U)
+    io.o_hzd    := (RegCnd.asUInt =/= 0.U)
 }

@@ -11,11 +11,11 @@ import isa._
 class Lgc extends Module {
 
 
-    /* I/O                          */
+    /* I/O                                  */
     val io = IO(new ALU_IO)
 
 
-    /* Assign                       */
+    /* Assign                               */
     io.o_dst  := DontCare
     when (io.i_vld) {
         switch (io.i_fc3) {

@@ -32,7 +32,7 @@ class REG_IO extends Bundle {
     val i_wrb_r = Input(Bool())                                     //Write-back Req.
     val i_wrb_d = Input(UInt((params.Parameters.DatWidth).W))       //Write-back Data
 
-    val o_imm   = Output(UInt((params.Parameters.ImmWidth).W))      //Immediate Port
+    val i_pc    = Output(UInt((params.Parameters.AddrWidth).W))     //Program Counter (PC) Port
 
     val o_as1   = Output(UInt((params.Parameters.DatWidth).W))      //ALU Operand-1 Port
     val o_as2   = Output(UInt((params.Parameters.DatWidth).W))      //ALU Operand-2 Port

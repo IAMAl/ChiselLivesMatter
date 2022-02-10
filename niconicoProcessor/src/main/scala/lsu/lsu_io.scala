@@ -22,7 +22,7 @@ class LSU_IO extends Bundle {
     val i_fc3 = Input( UInt((params.Parameters.Fc3Width).W))    //Function-3
     val i_rs1 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-1
     val i_rs2 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-2
-    val i_imm = Input( UInt((params.Parameters.ImmWidth).W))    //Address Offset
+    val i_imm = Input( UInt((params.Parameters.DatWidth).W))    //Address Offset
     val o_wrb = Output(Bool())                                  //Write-Back Flag
 
     val o_dreq = Output(Bool())                                 //Memory Access Request

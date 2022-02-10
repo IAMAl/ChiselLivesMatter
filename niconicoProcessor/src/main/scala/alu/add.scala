@@ -11,18 +11,21 @@ import isa._
 class Add extends Module {
 
 
-    /* I/O                          */
+    /* I/O                              */
     val io = IO(new ALU_IO)
 
 
-    /* Wire                         */
+    /* Wire                             */
     val rs2     = Wire(UInt((params.Parameters.DatWidth).W))
     val c_in    = Wire(UInt(1.W))
 
 
-    /* Assign                       */
+    /* Assign                           */
     //Selection of Right-Source Operand
-    when (io.i_fc7 === (params.Parameters.FC7_SUB).U) {
+    when (io.i_fc3(0) === (params.Parameters.FC3_UI).U) {
+        rs2 := io.i_mm
+    }
+    .elsewhen (io.i_fc7 === (params.Parameters.FC7_SUB).U) {
         //1's Complement for Subtraction
         rs2 := ~io.i_rs2
     }

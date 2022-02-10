@@ -15,11 +15,11 @@ class BRU extends Module {
     val JALR    = params.Parameters.OP_JALR.U
 
 
-    /* I/O                          */
+    /* I/O                              */
     val io      = IO(new BRU_IO)
 
 
-    /* Register                     */
+    /* Register                         */
     //Write-back Flag
     val WRB     = RegInit(Bool(), false.B)
 
@@ -32,33 +32,29 @@ class BRU extends Module {
     // Branch Condition
     val BC      = RegInit(Bool(), false.B)
 
-    /* Wire                         */
+    /* Wire                             */
     //Brach Condition
     val BRC     = Wire(Bool())
-
-    //Pre Program Counter Value
-    val PC_in   = Wire(UInt((params.Parameters.AddrWidth+1).W))
 
     //Jump Address
     val jmp     = Wire(SInt((params.Parameters.AddrWidth).W))
 
 
-    /* Assign                       */
+    /* Assign                           */
     //Jump-Immediate Composition
     imm     := io.i_imm
     when (io.i_jal === JAL) {
         //Jump and Link
-        jmp := imm(11, 0).asSInt((AddrWidth.W))
+        jmp := imm.asSInt((AddrWidth.W))
     }
     .elsewhen (io.i_jal === JALR) {
         //Jump and Link with Register-0
-        jmp := imm(11, 0).asSInt((AddrWidth.W))
+        jmp := imm.asSInt((AddrWidth.W))
     }
     .otherwise {
         jmp := 0.S
     }
 
-    PC_in   := PC
     BRC     := DontCare
     when (io.i_vld) {
         //Program Counter and Link
@@ -70,12 +66,12 @@ class BRU extends Module {
         .elsewhen (io.i_jal === JALR) {
             //Jump and Link Register
             //Indirect-Jump
-            PC  := (io.i_rs1.asSInt + jmp).asUInt
+            PC  := io.i_rs1.asSInt + jmp
             LNK := PC + 4.U
         }
         .elsewhen (BRC && (io.i_jal === 0.U)) {
             //Branch Taken
-            PC  := PC_in + imm.asSInt(AddrWidth.W)
+            PC  := (PC.asSInt() + imm.asSInt(AddrWidth.W)).asUInt()
         }
         .elsewhen (!BRC && (io.i_jal === 0.U)) {
             //Branch NOT Taken
@@ -112,7 +108,7 @@ class BRU extends Module {
     }
 
 
-    /* Output                       */
+    /* Output                           */
     //Branch Condition
     BC          := BRC
     io.o_brc    := BC
