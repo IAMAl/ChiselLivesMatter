@@ -10,7 +10,7 @@ import params._
 class ALU extends Module {
 
 
-    /* I/O                              */
+    /* I/O                                  */
     val io = IO(new Bundle {
         val i_vld       = Input( Bool())                                // Exec Validation
         val i_rs1       = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-1
@@ -24,18 +24,18 @@ class ALU extends Module {
     })
 
 
-    /* Module                           */
-    val Add     = Module(new Add)       //Adder
-    val Lgc     = Module(new Lgc)       //Logic
-    val Sft     = Module(new Sft)       //Shifter
+    /* Module                               */
+    val Add     = Module(new Add)           //Adder
+    val Lgc     = Module(new Lgc)           //Logic
+    val Sft     = Module(new Sft)           //Shifter
 
 
-    /* Register                         */
+    /* Register                             */
     val vld     = RegInit(Bool(), false.B)
     val dst     = Reg(UInt((params.Parameters.DatWidth).W))
 
 
-    /* Assign                           */
+    /* Assign                               */
     //Adder
     Add.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Add).U) && io.i_vld
     Add.io.i_fc3    := io.i_fc3
