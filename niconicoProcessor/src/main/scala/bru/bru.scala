@@ -48,11 +48,11 @@ class BRU extends Module {
     imm     := io.i_imm
     when (io.i_jal === JAL) {
         //Jump and Link
-        jmp := Cat(imm(20), Cat(imm(7, 0), Cat(imm(8), imm(19, 9)))).asUInt().asSInt()
+        jmp := imm(11, 0).asSInt((AddrWidth.W))
     }
     .elsewhen (io.i_jal === JALR) {
         //Jump and Link with Register-0
-        jmp := imm(20, 9).asSInt()
+        jmp := imm(11, 0).asSInt((AddrWidth.W))
     }
     .otherwise {
         jmp := 0.S
@@ -64,17 +64,18 @@ class BRU extends Module {
         //Program Counter and Link
         when (io.i_jal === JAL) {
             //Jump and Link
-            PC  := Cat(jmp, 0.S.asTypeOf(SInt(1.W))).asUInt
+            PC  := jmp.asUInt
             LNK := PC + 4.U
         }
         .elsewhen (io.i_jal === JALR) {
             //Jump and Link Register
-            PC  := io.i_rs1 + jmp.asSInt
+            //Indirect-Jump
+            PC  := (io.i_rs1.asSInt + jmp).asUInt
             LNK := PC + 4.U
         }
         .elsewhen (BRC && (io.i_jal === 0.U)) {
             //Branch Taken
-            PC  := PC_in + io.i_imm.asSInt
+            PC  := PC_in + imm.asSInt(AddrWidth.W)
         }
         .elsewhen (!BRC && (io.i_jal === 0.U)) {
             //Branch NOT Taken
