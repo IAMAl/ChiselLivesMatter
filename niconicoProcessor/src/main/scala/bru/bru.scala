@@ -10,9 +10,10 @@ import params._
 
 class BRU extends Module {
 
-    val InitPC  = params.Parameters.InitPC.U
-    val JAL     = params.Parameters.OP_JAL.U
-    val JALR    = params.Parameters.OP_JALR.U
+    val InitPC      = params.Parameters.InitPC.U
+    val JAL         = params.Parameters.OP_JAL.U
+    val JALR        = params.Parameters.OP_JALR.U
+    val AddrWidth   = params.Parameters.AddrWidth
 
 
     /* I/O                              */
@@ -21,7 +22,7 @@ class BRU extends Module {
 
     /* Register                         */
     //Program Counter
-    val PC      = RegInit(UInt((params.Parameters.AddrWidth).W), InitPC)
+    val PC      = RegInit(UInt(AddrWidth.W), InitPC)
 
 
     /* Wire                             */
@@ -29,10 +30,13 @@ class BRU extends Module {
     val BRC     = Wire(Bool())
 
     //Jump Address
-    val jmp     = Wire(SInt((params.Parameters.AddrWidth).W))
+    val jmp     = Wire(SInt(AddrWidth.W))
 
     //Link
-    val LNK     = Wire(UInt(params.Parameters.AddrWidth).W)
+    val LNK     = Wire(UInt(AddrWidth.W))
+
+    //Immediate
+    val imm     = Wire(UInt(AddrWidth.W))
 
 
     /* Assign                           */
@@ -40,11 +44,11 @@ class BRU extends Module {
     imm     := io.i_imm
     when (io.i_jal === JAL) {
         //Jump and Link
-        jmp := imm.asSInt((AddrWidth.W))
+        jmp := imm.asSInt()
     }
     .elsewhen (io.i_jal === JALR) {
         //Jump and Link with Register-0
-        jmp := imm.asSInt((AddrWidth.W))
+        jmp := imm.asSInt()
     }
     .otherwise {
         jmp := 0.S
@@ -66,7 +70,7 @@ class BRU extends Module {
         }
         .elsewhen (BRC && (io.i_jal === 0.U)) {
             //Branch Taken
-            PC  := (PC.asSInt() + imm.asSInt(AddrWidth.W)).asUInt()
+            PC  := (PC.asSInt() + imm.asSInt()).asUInt()
         }
         .elsewhen (!BRC && (io.i_jal === 0.U)) {
             //Branch NOT Taken

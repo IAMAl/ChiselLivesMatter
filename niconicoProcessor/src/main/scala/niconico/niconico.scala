@@ -13,6 +13,8 @@ import bru._
 import reg._
 import alu._
 import lsu._
+import csr._
+import rob._
 
 class NicoNico extends Module {
 
@@ -55,8 +57,6 @@ class NicoNico extends Module {
     //Register-Read
     REG.io.i_vld  	:= SCH.io.o_exe 	//Validate Register File
     REG.io.i_opc  	:= SCH.io.o_opc 	//Opcode
-    REG.io.i_by1  	:= SCH.io.o_by1 	//Bypassing Data Word-1
-    REG.io.i_by2  	:= SCH.io.o_by2 	//Bypassing Data Word-2
     REG.io.i_re1  	:= SCH.io.o_re1 	//Read Enable-1
     REG.io.i_re2  	:= SCH.io.o_re2 	//Read Enable-2
     REG.io.i_rn1  	:= SCH.io.o_rn1 	//Read Register Number-1

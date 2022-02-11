@@ -136,7 +136,7 @@ class LSU extends Module {
 
     //Set Memory Address Register
     when (io.i_vld) {
-        mar := io.i_rs1 + io.i_imm.SInt()
+        mar := io.i_rs1 + io.i_imm
     }
 
     //Set Memory Data Register

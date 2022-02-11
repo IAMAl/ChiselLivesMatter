@@ -2,13 +2,12 @@
 /* Module Class:    Utility                                 */
 /* Buffer                                                   */
 /* Right Holder:    Shigeyuki TAKANO                        */
-package utili
+package rob
 
 import chisel3._
 import chisel3.util._
 
 import params._
-import utili._
 
 
 class Entry (
@@ -89,9 +88,6 @@ class BuffCtrl (
 }
 
 
-class
-
-
 class ROB extends Module {
 
     val DatWidth    = params.Parameters.DatWidth
@@ -101,14 +97,14 @@ class ROB extends Module {
 
 
     /* I/O                              */
-    val io          = IO(new REG_IO)
+    val io          = IO(new ROB_IO)
 
 
     /* Module                                       */
     val BFCTRL      = Module(new BuffCtrl(BUFFLENGTH))
 
     // Power of 2 Depth Circular Buffer Memory
-    val BUFF        = Vec(BUFFLENGTH, new Entry(DatWidth, LogNumReg)))
+    val BUFF        = Vec(BUFFLENGTH, new Entry(DatWidth, LogNumReg))
 
     val PostDat     = new Entry(DatWidth, LogNumReg)// Output from Memory
 
@@ -129,7 +125,7 @@ class ROB extends Module {
     We              := io.i_set
 
     //Read-Enable
-    Re              := !Empty && BUFF(RPtr).V && BUFF(RPtr).W
+    Re              := !BFCTRL.io.O_Empty && BUFF(RPtr).V && BUFF(RPtr).W
 
     //Controll
     BFCTRL.io.I_We  := We
@@ -138,9 +134,6 @@ class ROB extends Module {
     //Write/Read Pointers
     WPtr            := BFCTRL.io.O_WP
     RPtr            := BFCTRL.io.O_RP
-
-    //Check Empty-State
-    io.O_Empty      := BFCTRL.io.O_Empty
 
     //Check Full-State
     Full            := BFCTRL.io.O_Full
@@ -171,7 +164,7 @@ class ROB extends Module {
         }
 
         //Bypassing
-        when (io.i_vld_c && BUFF(index).V && BUFF(index).W) {
+        when (io.i_vld && BUFF(index).V && BUFF(index).W) {
             when (io.i_rs1 === BUFF(index).WBRN) {
                 io.o_dat1 := BUFF(index).Data
                 io.o_bps1 := true.B
@@ -193,7 +186,7 @@ class ROB extends Module {
 
     //Read Data
     PostDat         := BUFF(RPtr)
-    io.o_dat        := W_PostDat.Data
-    io.o_wrn        := W_PostDat.WBRN
-    io.o_wrb        := W_PostDat.V && W_PostDat.W
+    io.o_dat        := PostDat.Data
+    io.o_wrn        := PostDat.WBRN
+    io.o_wrb        := PostDat.V && PostDat.W
 }

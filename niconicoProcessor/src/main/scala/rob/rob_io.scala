@@ -1,6 +1,6 @@
 // GPL-3 License (see LICENSE file)
 // https://github.com/IAMAl/niconicoProcessor
-package reg
+package rob
 
 import chisel3._
 import chisel3.util._
@@ -11,6 +11,7 @@ class ROB_IO extends Bundle {
     val DatWidth    = params.Parameters.DatWidth
     val LogNumReg   = params.Parameters.LogNumReg
 
+    val i_vld       = Input( Bool())            //
     val i_set       = Input( Bool())            //Set WB Reg No
     val i_wrn       = Input( UInt(LogNumReg.W)) //WB Reg No
 

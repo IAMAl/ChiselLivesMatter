@@ -1,6 +1,7 @@
-＊DS_Store
+*DS_Store
 *.v
 project/*
+target/*
 *vscode
 
 ### Project Specific stuff

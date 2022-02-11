@@ -11,10 +11,11 @@ import route._
 class SCH extends Module {
 
 
-    val LSB_Opc := params.Parameters.LSB_Opc
-    val MSB_Opc := params.Parameters.MSB_Opc
-    val LSB_Fc3 := params.Parameters.LSB_Fc3
-    val MSB_Fc3 := params.Parameters.MSB_Fc3
+    val LSB_Opc = params.Parameters.LSB_Opc
+    val MSB_Opc = params.Parameters.MSB_Opc
+    val LSB_Fc3 = params.Parameters.LSB_Fc3
+    val MSB_Fc3 = params.Parameters.MSB_Fc3
+
 
     /* I/O                              */
     val io = IO(new SCH_IO)

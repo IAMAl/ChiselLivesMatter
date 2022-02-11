@@ -18,11 +18,11 @@ class ALU extends Module {
         val i_imm       = Input( UInt((params.Parameters.DatWidth).W))  // Immediate
         val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))  // Immediate (Func3)
         val i_fc7       = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
-        val i_wrn       = Input( UInt(LogNumReg.W))                     // Write-Back Index
-        val o_wrn       = Output(UInt(LogNumReg.W))                     // Write-Back Index
+        val i_wrn       = Input( UInt((params.Parameters.LogNumReg).W)) // Write-Back Index
+        val o_wrn       = Output(UInt((params.Parameters.LogNumReg).W)) // Write-Back Index
         val o_dst       = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
         val o_wrb       = Output(Bool())                                // Writeback Request
-        val i_UnitID    = Input( UInt(3.W))                             // Operation Unit ID
+        val i_UID       = Input( UInt(3.W))                             // Operation Unit ID
     })
 
 
@@ -34,7 +34,7 @@ class ALU extends Module {
 
     /* Assign                               */
     //Adder
-    Add.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Add).U) && io.i_vld
+    Add.io.i_vld    := (io.i_UID === (params.Parameters.UnitID_Add).U) && io.i_vld
     Add.io.i_fc3    := io.i_fc3
     Add.io.i_fc7    := io.i_fc7
     Add.io.i_rs1    := io.i_rs1
@@ -42,7 +42,7 @@ class ALU extends Module {
     Add.io.i_imm    := io.i_imm
 
     //Logic
-    Lgc.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Lgc).U) && io.i_vld
+    Lgc.io.i_vld    := (io.i_UID === (params.Parameters.UnitID_Lgc).U) && io.i_vld
     Lgc.io.i_fc3    := io.i_fc3
     Lgc.io.i_fc7    := io.i_fc7
     Lgc.io.i_rs1    := io.i_rs1
@@ -50,7 +50,7 @@ class ALU extends Module {
     Lgc.io.i_imm    := 0.U
 
     //Shifter
-    Sft.io.i_vld    := (io.i_UnitID === (params.Parameters.UnitID_Sft).U) && io.i_vld
+    Sft.io.i_vld    := (io.i_UID === (params.Parameters.UnitID_Sft).U) && io.i_vld
     Sft.io.i_fc3    := io.i_fc3
     Sft.io.i_fc7    := io.i_fc7
     Sft.io.i_rs1    := io.i_rs1

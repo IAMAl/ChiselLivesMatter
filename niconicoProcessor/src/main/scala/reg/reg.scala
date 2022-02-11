@@ -46,16 +46,17 @@ class REG extends Module {
     /* Assign                           */
     //Signed Immediate's Pre-Formatting
     when (io.i_opc === (params.Parameters.OP_STORE).U) {        //Store
-        imm := Cat(Fill(20.U, io.i_fc7(6)), Cat(io.i_fc7, io.i_wno))
+        imm := Cat(Fill(20, io.i_fc7(6)), Cat(io.i_fc7, io.i_wno))
     }
     .elsewhen (io.i_opc === (params.Parameters.OP_LOAD).U) {    //Load
-        imm := Cat(Fill(20.U, io.i_fc7(6)), Cat(io.i_fc7, io.i_rn2))
+        imm := Cat(Fill(20, io.i_fc7(6)), Cat(io.i_fc7, io.i_rn2))
     }
     .elsewhen (io.i_opc === (params.Parameters.OP_BRJMP).U) {   //Branch/Jump
-        imm := Cat(Fill(19.U, io.i_fc7(6)), Cat(io.i_fc7(6), Cat(io.i_wno(0), Cat(io.i_fc7(5,0), Cat(io.i_wno(4, 1), 0.U.asTypeOf(UInt(1.W)))))))
+        imm := Cat(Fill(19, io.i_fc7(6)), Cat(io.i_fc7(6), Cat(io.i_wno(0), Cat(io.i_fc7(5,0), Cat(io.i_wno(4, 1), 0.U.asTypeOf(UInt(1.W)))))))
     }
-    .elsewhen (io.i_opc === (params.Parameters.OP_UI).U) {      //LUI/AUIPC
-        imm := Cat(Fill(11.U, io.i_fc7(6)), Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, Cat(io.i_fc3, 0.U.asTypeOf(UInt(12.W)))))))
+    .elsewhen ((io.i_opc === (params.Parameters.OP_RandI).U) && ((io.i_fc3 === (params.Parameters.FC3_AUIPC).U) || (io.i_fc3 === (params.Parameters.FC3_AUIPC).U))) {
+        //LUI/AUIPC
+        imm := Cat(Fill(11, io.i_fc7(6)), Cat(io.i_fc7, Cat(io.i_rn2, Cat(io.i_rn1, Cat(io.i_fc3, 0.U.asTypeOf(UInt(12.W)))))))
     }
     .otherwise {
         imm := 0.U
@@ -68,15 +69,11 @@ class REG extends Module {
 
     //Read Source-1
     when (io.i_vld) {
-        when (io.i_re1 && io.i_by1) {
-            //Bypass
-            rs1 := io.i_wrb_d
-        }
-        .elsewhen (io.i_re1) {
+        when (io.i_re1) {
             //Read Register File
             rs1 := RF(io.i_rn1)
         }
-        .elsewhen (fc3 == (params.Parameters.FC3_AUIPC).U) {
+        .elsewhen (io.i_fc3 === (params.Parameters.FC3_AUIPC).U) {
             //AUIPC
             rs1 := io.i_pc
         }
@@ -84,11 +81,7 @@ class REG extends Module {
 
     //Read Source-2
     when (io.i_vld) {
-        when (io.i_re2 && io.i_by2) {
-            //Bypass
-            rs2 := io.i_wrb_d
-        }
-        .elsewhen (io.i_re2) {
+        when (io.i_re2) {
             //Read Register File
             rs2 := RF(io.i_rn2)
         }
@@ -107,16 +100,16 @@ class REG extends Module {
     io.o_opcode := opcode
 
     rn1         := io.i_rn1 //RegisterFile No for Source-1
-    io.o_rn1_o  := rn1
+    io.o_rn1    := rn1
 
     rn2         := io.i_rn2 //RegisterFile No for Source-2
-    io.o_rn2_o  := rn2
+    io.o_rn2    := rn2
 
     fc3         := io.i_fc3 //Func3
-    io.o_fc3_o  := fc3
+    io.o_fc3    := fc3
 
     fc7         := io.i_fc7 //Func7
-    io.o_fc7_o  := fc7
+    io.o_fc7    := fc7
 
     //Arithmetic Source Operands
     alu         := (io.i_opc === (params.Parameters.OP_RandI).U) || (io.i_opc === (params.Parameters.OP_RandR).U)
@@ -124,10 +117,7 @@ class REG extends Module {
         //Set Source Operands for
         // Source-1&2 are from RegisterFile
         // Source-1 is from RegisterFile
-
-        .otherwise {
-            io.o_as1    := rs1
-        }
+        io.o_as1    := rs1
         io.o_as2    := rs2
     }
     .otherwise {

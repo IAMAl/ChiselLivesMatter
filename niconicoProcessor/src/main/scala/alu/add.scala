@@ -22,8 +22,8 @@ class Add extends Module {
 
     /* Assign                           */
     //Selection of Right-Source Operand
-    when (io.i_fc3(0) === (params.Parameters.FC3_UI).U) {
-        rs2 := io.i_mm
+    when ((io.i_fc3 === (params.Parameters.FC3_AUIPC).U) || (io.i_fc3 === (params.Parameters.FC3_AUIPC).U)) {
+        rs2 := io.i_imm
     }
     .elsewhen (io.i_fc7 === (params.Parameters.FC7_SUB).U) {
         //1's Complement for Subtraction

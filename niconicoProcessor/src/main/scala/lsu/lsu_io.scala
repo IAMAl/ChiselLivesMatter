@@ -24,8 +24,8 @@ class LSU_IO extends Bundle {
     val i_rs2 = Input( UInt((params.Parameters.DatWidth).W))    //Source Operand-2
     val i_imm = Input( UInt((params.Parameters.DatWidth).W))    //Address Offset
 
-    val i_wrn = Input( UInt(LogNumReg.W))                       // Write-Back Index
-    val o_wrn = Output(UInt(LogNumReg.W))                       // Write-Back Index
+    val i_wrn = Input( UInt(params.Parameters.LogNumReg.W))     //Write-Back Index
+    val o_wrn = Output(UInt(params.Parameters.LogNumReg.W))     //Write-Back Index
     val o_wrb = Output(Bool())                                  //Write-Back Flag
 
     val o_dreq = Output(Bool())                                 //Memory Access Request

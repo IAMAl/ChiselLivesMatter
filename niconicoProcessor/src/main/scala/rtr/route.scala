@@ -61,7 +61,7 @@ class URT extends Module {
     io.o_UID    := UnitID
     io.o_EnWB   := EnWB
 
-    is_CSU      := (UnitID === (params.Parameters.OP_CSR).U) && (io.i_fc3 === (params.Parameters.FS3_CSR))
+    is_CSU      := (UnitID === (params.Parameters.OP_CSR).U)
     io.o_is_CSU := is_CSU
 
     is_ALU      := (UnitID === (params.Parameters.OP_RandI).U) || (UnitID === (params.Parameters.OP_RandR).U)
@@ -70,6 +70,6 @@ class URT extends Module {
     is_LSU      := (UnitID === (params.Parameters.OP_LOAD).U)  || (UnitID === (params.Parameters.OP_STORE).U)
     io.o_is_LSU := is_LSU
 
-    is_BRU      := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U) && (io.i_fc3 =/= (params.Parameters.FS3_CSR))
+    is_BRU      := (UnitID === (params.Parameters.OP_BRJMP).U) || (UnitID === (params.Parameters.OP_JAL).U)
     io.o_is_BRU := is_BRU
 }
