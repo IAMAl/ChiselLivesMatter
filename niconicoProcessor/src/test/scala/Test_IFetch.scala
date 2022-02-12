@@ -14,19 +14,22 @@ class Test_IFetch extends FlatSpec with ChiselScalatestTester with Matchers {
         test(new FCH) { dut =>
             // Program Files
             //val filename = "./src/test/scala/program.txt"
-
-            for (cycle<-0 until 256) {
+            var cycle = 0
+            for (cycle<-0 until 16) {
                 dut.io.i_boot.poke(     false.B )
                 dut.io.i_stall.poke(    false.B )
                 dut.io.i_brc.poke(      false.B )
-                dut.io.o_ireq.poke(     false.B )
                 dut.io.i_iack.poke(     false.B )
                 dut.io.i_ifch.poke(0x00000000.U )
 
                 dut.clock.step()
 
-                dut.io.o_exe.poke(      false.B )
-                dut.io.o_ins.poke( 0x00000000.U )
+                var req = dut.io.o_ireq.peek()
+                var exe = dut.io.o_exe.peek()
+                var ins = dut.io.o_ins.peek()
+                println("req: "+req)
+                println("exe: "+exe)
+                println("ins: "+ins)
             }
         }
     }

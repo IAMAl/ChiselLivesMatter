@@ -24,13 +24,16 @@ class NicoNico extends Module {
 
 
     /* Module                       	*/
+    //Front-End
     val FCH = Module(new FCH)     		//Instruction Fetch Unit
     val SCH = Module(new SCH)     		//Scheduler
     val REG = Module(new REG)     		//Register File
+
+    //F/B Routing
+    val URT = Module(new URT)     		//Router
     val ROB = Module(new ROB)   		//ROB
 
-    val URT = Module(new URT)     		//Router
-
+    //Back-End
     val ALU = Module(new ALU)     		//Arithmetic/Logic Unit
     val LSU = Module(new LSU)     		//Load/Store Unit
     val BRU = Module(new BRU)     		//Branch Unit
