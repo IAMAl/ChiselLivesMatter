@@ -75,8 +75,10 @@ class LSU extends Module {
     /* Register                         */
     val mar     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Address Register (MAR)
     val mdr     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Data Register (MDR)
+    val dreq    = RegInit(Bool(), false.B)                  //
     val LdDone  = RegInit(Bool(), false.B)                  //
     val wrn     = Reg(UInt((params.Parameters.LogNumReg).W))//
+    val St      = RegInit(Bool(), false.B)                  //Store Instruction Flag
 
 
     /* Wire                             */
@@ -124,7 +126,7 @@ class LSU extends Module {
     is_St   := io.i_vld && (io.i_opc === (params.Parameters.OP_STORE).U)
 
     //Loading Path
-    when (!io.i_vld && !LdReq.io.Busy) {
+    when (!io.i_vld) {
         LdDone  := false.B
     }
     .elsewhen (LdReq.io.LdValid) {
@@ -151,30 +153,54 @@ class LSU extends Module {
     }
 
     //Output
-    when (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_BYTE).U) {
-        //1-Byte Access
-        io.o_csel(0)    := 1.U
-        io.o_csel(1)    := 0.U
-        io.o_csel(2)    := 0.U
-        io.o_csel(3)    := 0.U
+    when (ISA_fc3_lsu.io.o_LSType === (params.Parameters.FC3_BYTE).U) {
+        when (dreq) {
+            //1-Byte Access
+            io.o_csel(0)    := 1.U
+            io.o_csel(1)    := 0.U
+            io.o_csel(2)    := 0.U
+            io.o_csel(3)    := 0.U
+        }
+        .otherwise {
+            io.o_csel(0)    := 0.U
+            io.o_csel(1)    := 0.U
+            io.o_csel(2)    := 0.U
+            io.o_csel(3)    := 0.U
+        }
 
         msk := 0x000000FF.S
     }
-    .elsewhen (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_HWORD).U) {
-        //2-Byte Access
-        io.o_csel(0)    := 1.U
-        io.o_csel(1)    := 1.U
-        io.o_csel(2)    := 0.U
-        io.o_csel(3)    := 0.U
+    .elsewhen ((ISA_fc3_lsu.io.o_LSType === (params.Parameters.FC3_HWORD).U)) {
+        when (dreq) {
+            //2-Byte Access
+            io.o_csel(0)    := 1.U
+            io.o_csel(1)    := 1.U
+            io.o_csel(2)    := 0.U
+            io.o_csel(3)    := 0.U
+        }
+        .otherwise {
+            io.o_csel(0)    := 0.U
+            io.o_csel(1)    := 0.U
+            io.o_csel(2)    := 0.U
+            io.o_csel(3)    := 0.U
+        }
 
         msk := 0x0000FFFF.S
     }
-    .elsewhen (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_WORD).U) {
-        //4-Byte Access
-        io.o_csel(0)    := 1.U
-        io.o_csel(1)    := 1.U
-        io.o_csel(2)    := 1.U
-        io.o_csel(3)    := 1.U
+    .elsewhen (dreq && (ISA_fc3_lsu.io.o_LSType ===  (params.Parameters.FC3_WORD).U)) {
+        when (dreq) {
+            //4-Byte Access
+            io.o_csel(0)    := 1.U
+            io.o_csel(1)    := 1.U
+            io.o_csel(2)    := 1.U
+            io.o_csel(3)    := 1.U
+        }
+        .otherwise {
+            io.o_csel(0)    := 0.U
+            io.o_csel(1)    := 0.U
+            io.o_csel(2)    := 0.U
+            io.o_csel(3)    := 0.U
+        }
 
         msk := 0xFFFFFFFF.S
     }
@@ -192,11 +218,29 @@ class LSU extends Module {
         wrn := io.i_wrn
     }
 
-    io.o_dreq   := LdReq.io.Req
+    dreq        := LdReq.io.Req || is_St
+    io.o_dreq   := dreq
     io.o_stor   := is_St
     io.o_dmar   := mar
-    io.o_dst    := mdr
-    io.o_odat   := mdr
+
+    St          := is_St
+    when (St) {
+        io.o_dst    := 0.U
+    }
+    .otherwise {
+        io.o_dst    := mdr
+    }
+    
+    when (St) {
+        io.o_odat   := mdr
+    }
+    .otherwise {
+        io.o_odat   := 0.U
+    }
     io.o_wrn    := wrn
     io.o_wrb    := LdDone
+}
+
+object MEMMain extends App {
+  chisel3.Driver.execute(args,()=>new LSU)
 }
