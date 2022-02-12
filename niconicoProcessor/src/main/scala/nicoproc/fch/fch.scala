@@ -25,19 +25,28 @@ class FCH extends Module {
     //Execution Enable on Next Pipeline Stage
     val exe     = RegInit(Bool(), false.B)
 
+    val run     = RegInit(Bool(), false.B)
+
+    val stall   = RegInit(Bool(), false.B)
+
     //Instruction Register
     val IR      = RegInit(UInt((params.Parameters.ISAWidth).W), 0.U)
 
 
     /* Assign                           */
     //Access Validation
-    LdReq.io.LdReq    := io.i_boot
-    LdReq.io.LdAck    := io.i_iack
-    LdReq.io.Stall    := io.i_stall
+    when (io.i_boot) {
+    	run		:= true.B
+    }
+	stall	:= io.i_stall
+
+    LdReq.io.LdReq	:= run
+    LdReq.io.LdAck  := io.i_iack
+    LdReq.io.Stall  := stall
     //LdReq.io.Busy
 
     //Valid Followed Pipeline Stage
-    exe := LdReq.io.LdValid && !io.i_brc && !io.i_stall
+    exe := LdReq.io.LdValid && !io.i_brc && !stall
 
     //Capture Instruction Register
     when (LdReq.io.LdValid) {

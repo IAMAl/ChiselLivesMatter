@@ -47,7 +47,7 @@ class NicoNico extends Module {
     FCH.io.i_ifch 	:= io.inst      	//Input 32b Word Instruction
     FCH.io.i_brc  	:= BRU.io.o_brc 	//Flush by Branch Taken
     FCH.io.i_stall	:= SCH.io.o_hzd ||  //Stall by Hazard
-						ROB.io.o_full
+						ROB.io.o_full   //or by Full in ROB
 
 
     //Stage-2
