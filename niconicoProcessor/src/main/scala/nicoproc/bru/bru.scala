@@ -14,6 +14,8 @@ class BRU extends Module {
     val JAL         = params.Parameters.OP_JAL.U
     val JALR        = params.Parameters.OP_JALR.U
     val AddrWidth   = params.Parameters.AddrWidth
+    val DatWidth    = params.Parameters.DatWidth
+    val LogNumReg   = params.Parameters.LogNumReg
 
 
     /* I/O                              */
@@ -23,6 +25,18 @@ class BRU extends Module {
     /* Register                         */
     //Program Counter
     val PC      = RegInit(UInt(AddrWidth.W), InitPC)
+
+    //Link Value
+    val dst     = Reg(UInt(DatWidth.W))
+
+    //Branch Condition
+    val brc     = Reg(Bool())
+
+    //Write-Back Register Number
+    val wrn     = Reg(UInt(LogNumReg.W))
+
+    //Write-Back Request
+    val wrb     = RegInit(Bool(), false.B)
 
 
     /* Wire                             */
@@ -55,6 +69,7 @@ class BRU extends Module {
     }
 
     BRC     := DontCare
+    LNK     := DontCare
     when (io.i_vld) {
         //Program Counter and Link
         when (io.i_jal === JAL) {
@@ -65,16 +80,18 @@ class BRU extends Module {
         .elsewhen (io.i_jal === JALR) {
             //Jump and Link Register
             //Indirect-Jump
-            PC  := io.i_rs1.asSInt + jmp
+            PC  := (io.i_rs1.asSInt + jmp).asUInt
             LNK := PC + 4.U
         }
         .elsewhen (BRC && (io.i_jal === 0.U)) {
             //Branch Taken
             PC  := (PC.asSInt() + imm.asSInt()).asUInt()
+            LNK := 0.U
         }
         .elsewhen (!BRC && (io.i_jal === 0.U)) {
             //Branch NOT Taken
             PC  := PC + 4.U
+            LNK := 0.U
         }
 
         //Branch Condition
@@ -105,20 +122,35 @@ class BRU extends Module {
             }
         }
     }
+    .otherwise {
+        BRC     := false.B
+        LNK     := false.B
+    }
 
 
     /* Output                           */
     //Branch Condition
-    io.o_brc    := BRC
+    brc         := BRC && io.i_vld
+    io.o_brc    := brc
 
     //Program Counter Value
     io.o_pc     := PC
 
     //Write-back Request
-    io.o_wrb    := ((io.i_jal === JAL) || (io.i_jal === JALR)) && io.i_vld
+    wrb         := ((io.i_jal === JAL) || (io.i_jal === JALR)) && io.i_vld
+    io.o_wrb    := wrb
 
     //Link Value
-    io.o_dst    := LNK
+    dst         := LNK
+    io.o_dst    := dst
 
-    io.o_wrn    := io.i_wrn
+    //Write-Back Register Number
+    when (io.i_vld) {
+        wrn         := io.i_wrn
+    }
+    io.o_wrn    := wrn
+}
+
+object BRUMain extends App {
+  chisel3.Driver.execute(args,()=>new BRU)
 }

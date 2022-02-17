@@ -10,7 +10,7 @@ import lsu._
 
 
 class Test_LdSt extends FlatSpec with ChiselScalatestTester with Matchers {
-    it should "Test: Instr. Fetch" in {
+    it should "Test: Load/Store Unit" in {
         test(new LSU) { dut =>
             // Program Files
             //val filename = "./src/test/scala/program.txt"
