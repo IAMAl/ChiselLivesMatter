@@ -98,7 +98,7 @@ class SCH extends Module {
         CndDst  := true.B
     }
 
-    //Reading Immediate (WN)at Store or Branch
+    //Reading Immediate (WN) at Store or Branch
     imm_SB      := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_STORE).U) ||
                     (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U))
 
@@ -162,13 +162,13 @@ class SCH extends Module {
     WAWDst(3)   := (RegWNo(3) === RegWNo(0)) && RegVld(3)
 
     //Write-After-Read
-    WARSr1(0)   := (RegRN1(0) === ISplit.io.o_wno)
-    WARSr1(1)   := (RegRN1(1) === RegWNo(0))
-    WARSr1(2)   := (RegRN1(2) === RegWNo(0))
+    WARSr1(0)   := (RegRN1(0) === ISplit.io.o_wno) && RegVld(0) 
+    WARSr1(1)   := (RegRN1(1) === RegWNo(0)) && RegVld(1) 
+    WARSr1(2)   := (RegRN1(2) === RegWNo(0)) && RegVld(2) 
 
-    WARSr2(0)   := (RegRN2(0) === ISplit.io.o_wno)
-    WARSr2(1)   := (RegRN2(1) === RegWNo(0))
-    WARSr2(2)   := (RegRN2(2) === RegWNo(0))
+    WARSr2(0)   := (RegRN2(0) === ISplit.io.o_wno) && RegVld(0) 
+    WARSr2(1)   := (RegRN2(1) === RegWNo(0)) && RegVld(1) 
+    WARSr2(2)   := (RegRN2(2) === RegWNo(0)) && RegVld(2) 
 
 
     /* Stall Detection                  */
