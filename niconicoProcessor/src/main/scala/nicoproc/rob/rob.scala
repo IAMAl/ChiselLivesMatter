@@ -101,6 +101,7 @@ class ROB extends Module {
 
 
     /* Module                                       */
+    // Power of 2 Depth Circular Buffer Controller
     val BFCTRL      = Module(new BuffCtrl(BUFFLENGTH))
 
     // Power of 2 Depth Circular Buffer Memory
@@ -150,16 +151,16 @@ class ROB extends Module {
     }
     for (index<-0 until BUFFLENGTH) {
         //Write Back
-        when (io.i_wrb_c && (io.i_wrn_c === BUFF(index).WBRN)) {
+        when (io.i_wrb_c && BUFF(index).V && (io.i_wrn_c === BUFF(index).WBRN)) {
             BUFF(index).Data:= io.i_wrb_c
         }
-        when (io.i_wrb_a && (io.i_wrn_a === BUFF(index).WBRN)) {
+        when (io.i_wrb_a && BUFF(index).V && (io.i_wrn_a === BUFF(index).WBRN)) {
             BUFF(index).Data:= io.i_wrb_a
         }
-        when (io.i_wrb_b && (io.i_wrn_b === BUFF(index).WBRN)) {
+        when (io.i_wrb_b && BUFF(index).V && (io.i_wrn_b === BUFF(index).WBRN)) {
             BUFF(index).Data:= io.i_wrb_b
         }
-        when (io.i_wrb_m && (io.i_wrn_m === BUFF(index).WBRN)) {
+        when (io.i_wrb_m && BUFF(index).V && (io.i_wrn_m === BUFF(index).WBRN)) {
             BUFF(index).Data:= io.i_wrb_m
         }
 
