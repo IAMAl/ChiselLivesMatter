@@ -62,30 +62,33 @@ class LdReq extends Module {
 
 class LSU extends Module {
 
+    val LogNumReg   = params.Parameters.LogNumReg
+    val DataWidth   = params.Parameters.DataWidth
+
 
     /* I/O                              */
     val io = IO(new LSU_IO)
 
 
     /* Module                           */
-    val ISA_fc3_lsu = Module(new ISA_fc3_lsu)               //Func3 Decoder
-    val LdReq       = Module(new LdReq)                     //Load Request Controller
+    val ISA_fc3_lsu = Module(new ISA_fc3_lsu)   //Func3 Decoder
+    val LdReq       = Module(new LdReq)         //Load Request Controller
 
 
     /* Register                         */
-    val mar     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Address Register (MAR)
-    val mdr     = Reg(UInt((params.Parameters.DatWidth).W)) //Memory Data Register (MDR)
-    val dreq    = RegInit(Bool(), false.B)                  //
-    val LdDone  = RegInit(Bool(), false.B)                  //
-    val wrn     = Reg(UInt((params.Parameters.LogNumReg).W))//
-    val St      = RegInit(Bool(), false.B)                  //Store Instruction Flag
+    val mar     = Reg(UInt(DataWidth.W))        //Memory Address Register (MAR)
+    val mdr     = Reg(UInt(DataWidth.W))        //Memory Data Register (MDR)
+    val dreq    = RegInit(Bool(), false.B)      //
+    val LdDone  = RegInit(Bool(), false.B)      //
+    val wrn     = Reg(UInt(LogNumReg.W))        //
+    val St      = RegInit(Bool(), false.B)      //Store Instruction Flag
 
 
     /* Wire                             */
-    val is_Ld   = Wire(Bool())                              //Load  Instruction Flag
-    val is_St   = Wire(Bool())                              //Store Instruction Flag
-    val dat     = Wire(UInt((params.Parameters.DatWidth).W))//Load Data
-    val msk     = Wire(SInt((params.Parameters.DatWidth).W))//Access Mask
+    val is_Ld   = Wire(Bool())                  //Load  Instruction Flag
+    val is_St   = Wire(Bool())                  //Store Instruction Flag
+    val dat     = Wire(UInt(DataWidth.W))       //Load Data
+    val msk     = Wire(SInt(DataWidth.W))       //Access Mask
 
 
     /* Assign                           */

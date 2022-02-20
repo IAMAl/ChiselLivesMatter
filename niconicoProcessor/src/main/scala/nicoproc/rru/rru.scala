@@ -35,7 +35,7 @@ class Encoder_ (
             GrantNo(index)  := 0.U
         }
     }
-    
+
     io.o_enc    := GrantNo.reduce(_ | _).asUInt
 }
 
@@ -48,8 +48,8 @@ class Decoder_ (
     /* I/O                                                  */
     val io = IO(new Bundle {
         val i_req   = Input( Bool())
-        val i_wrn   = Input(UInt(log2Ceil(NumInputs).W))    // Set of Signal
-        val o_grt   = Input( Vec(NumInputs, Bool()))        // Decoded Flag
+        val i_wrn   = Input( UInt(log2Ceil(NumInputs).W))   // Set of Signal
+        val o_grt   = Output(Vec(NumInputs, Bool()))        // Decoded Flag
     })
 
     for (idx<-0 until NumInputs) {
@@ -161,7 +161,7 @@ class Arbiter_ (
 
 
 class RenameEntry (
-        DatWidth:   Int,
+        DataWidth:  Int,
         LogNumReg:  Int
     ) extends Bundle {
     val RFN         = Reg(UInt(LogNumReg.W))
@@ -170,10 +170,16 @@ class RenameEntry (
 
 class RRU extends Module {
 
-    val LSB_Opc = params.Parameters.LSB_Opc
-    val MSB_Opc = params.Parameters.MSB_Opc
-    val LSB_Fc3 = params.Parameters.LSB_Fc3
-    val MSB_Fc3 = params.Parameters.MSB_Fc3
+    val LSB_Opc     = params.Parameters.LSB_Opc
+    val MSB_Opc     = params.Parameters.MSB_Opc
+    val LSB_Fc3     = params.Parameters.LSB_Fc3
+    val MSB_Fc3     = params.Parameters.MSB_Fc3
+    val OpcWidth    = params.Parameters.OpcWidth
+    val Fc3Width    = params.Parameters.Fc3Width
+    val Fc7Width    = params.Parameters.Fc7Width
+    val LogNumReg   = params.Parameters.LogNumReg
+    val PNumReg     = params.Parameters.PNumReg
+    val PLogNumReg  = params.Parameters.PLogNumReg
 
 
     /* I/O                              */
@@ -183,42 +189,42 @@ class RRU extends Module {
     /* Module                           */
     val ISplit  = Module(new ISplit)
 
-    val Arbiter = Module(new Arbiter_(48))
+    val Arbiter = Module(new Arbiter_(PNumReg))
 
 
     /* Register                         */
     val Vld         = RegInit(Bool(), false.B)
-    val Opc         = Reg(UInt((params.Parameters.OpcWidth).W))
-    val Wno         = Reg(UInt((params.Parameters.LogNumReg+1).W))
-    val Rn1         = Reg(UInt((params.Parameters.LogNumReg+1).W))
-    val Rn2         = Reg(UInt((params.Parameters.LogNumReg+1).W))
-    val Fc3         = Reg(UInt((params.Parameters.Fc3Width).W))
-    val Fc7         = Reg(UInt((params.Parameters.Fc7Width).W))
+    val Opc         = Reg(UInt(OpcWidth.W))
+    val Wno         = Reg(UInt(PLogNumReg.W))
+    val Rn1         = Reg(UInt(PLogNumReg.W))
+    val Rn2         = Reg(UInt(PLogNumReg.W))
+    val Fc3         = Reg(UInt(Fc3Width.W))
+    val Fc7         = Reg(UInt(Fc7Width.W))
     val Re1         = RegInit(Bool(), false.B)
     val Re2         = RegInit(Bool(), false.B)
     val EnWB        = RegInit(Bool(), false.B)
     val Hzd         = RegInit(Bool(), false.B)
 
-    val RRFN        = Reg(Vec(48, new Module(RenameEntry(DatWidth, LogNumReg+1))))
+    val RRFN        = Reg(Vec(PNumReg, new Module(RenameEntry(DataWidth, PLogNumReg))))
 
 
     /* Wire                             */
     //Value Holder
-    val opc         = Wire(UInt((params.Parameters.OpcWidth).W))
-    val wno         = Wire(UInt((params.Parameters.LogNumReg).W))
-    val rn1         = Wire(UInt((params.Parameters.LogNumReg).W))
-    val rn2         = Wire(UInt((params.Parameters.LogNumReg).W))
-    val fc3         = Wire(UInt((params.Parameters.Fc3Width).W))
-    val fc7         = Wire(UInt((params.Parameters.Fc7Width).W))
+    val opc         = Wire(UInt(OpcWidth.W))
+    val wno         = Wire(UInt(LogNumReg.W))
+    val rn1         = Wire(UInt(LogNumReg.W))
+    val rn2         = Wire(UInt(LogNumReg.W))
+    val fc3         = Wire(UInt(Fc3Width.W))
+    val fc7         = Wire(UInt(Fc7Width.W))
     val empty       = Wire(Bool())
     val full        = Wire(Bool())
     val cond        = Wire(Bool())
-    val hzrd        = Wire(Vec(params.Parameters.LogNumReg+1, Bool()))
+    val hzrd        = Wire(Vec(PLogNumReg, Bool()))
 
     //Immediate Value
     val imm_dst     = Wire(Bool())
     val imm_src     = Wire(Bool())
-    
+
     //Use of Register File
     val reg_req     = Wire(Bool())
 
@@ -247,17 +253,17 @@ class RRU extends Module {
 
     ////Register Renaming
     //Flag: Write-Back to Register File
-    reg_req     := !imm_dst
+    reg_req             := !imm_dst
     Decoder.i_req       := io.i_wrb
     Decoder.i_wrn       := io.i_wbn
     Arbiter.io.i_req    := io.i_vld && (reg_req || cond)
     Arbiter.io.I_Rls    := Decoder.o_grt
     full                := Arbiter.io.o_full
     empty               := Arbiter.io.o_empty
-    for (idx<- until 48) {
+    for (idx<- until PNumReg) {
         when (io.i_vld && reg_req && !full) {
             when (cond) {
-                RRFN(Arbiter.io.o_grt).RFN  := 32
+                RRFN(Arbiter.io.o_grt).RFN  := (PNumReg-1).U
             }
             .otherwise {
                 RRFN(Arbiter.io.o_grt).RFN  := wno
@@ -265,10 +271,10 @@ class RRU extends Module {
         }
     }
     Wno         := Decoder.o_grt
-    
+
     //Write-Back Enable Assertion
-    when (  (UnitID === (params.Parameters.OP_RandI).U) || 
-            (UnitID === (params.Parameters.OP_RandR).U) || 
+    when (  (UnitID === (params.Parameters.OP_RandI).U) ||
+            (UnitID === (params.Parameters.OP_RandR).U) ||
             (UnitID === (params.Parameters.OP_LOAD).U)  ||
             (UnitID === (params.Parameters.OP_JAL).U)   ||
             (UnitID === (params.Parameters.OP_CSR).U)
@@ -289,12 +295,12 @@ class RRU extends Module {
     //Output Renamed Register No.
     for (idx<-0 until NumInputs) {
         when (rn1 === RRFN(idx).RFN) {
-            RN1 := RRFN(idx).RenamedWRN
+            Rn1 := RRFN(idx).RenamedWRN
         }
         when (rn2 === RRFN(idx).RFN) {
-            RN2 := RRFN(idx).RenamedWRN
+            Rn2 := RRFN(idx).RenamedWRN
         }
-        when (32.U === RRFN(idx).RFN) {
+        when ((PNumReg-1).U === RRFN(idx).RFN) {
             hzrd(idx)   := Arbiter.io.o_vld(idx)
         }
         .otherwise {

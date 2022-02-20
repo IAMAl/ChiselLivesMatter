@@ -10,20 +10,20 @@ object Parameters {
     val ISAWidth        = 32
 
     //Instruction Bit-Field Width
-    val ILEnc           = 2 
+    val ILEnc           = 2
     val OpcWidth        = 4
     val Fc3Width        = 3
     val Fc7Width        = 7
     val ImmWidth        = 12
 
     //Datapath Width
-    val DatWidth        = 32
-    val LogDWidth       = log2Ceil(DatWidth)
+    val DataWidth       = 32
+    val LogDWidth       = log2Ceil(DataWidth)
 
     //Register File Size
     val NumReg          = 32
     val LogNumReg       = log2Ceil(NumReg)
-    
+
     //Physical Register File Size
     val PNumReg         = 48
     val PLogNumReg      = log2Ceil(PNumReg)
@@ -68,7 +68,7 @@ object Parameters {
     val FC3_CSRRWI      = 0x5
     val FC3_CSRRSI      = 0x6
     val FC3_CSRRCI      = 0x7
-    
+
     //Adder
     val FC3_ADD         = 0x0
     val FC3_AUIPC       = 0x1   //AUIPC

@@ -10,7 +10,7 @@ import params._
 
 class REG extends Module {
 
-    val DataWidth   = params.Parameters.DatWidth
+    val DataWidth   = params.Parameters.DataWidth
     val NumReg      = params.Parameters.NumReg
 
 
@@ -20,13 +20,13 @@ class REG extends Module {
 
     /* Register                         */
     //Register File
-    val RF      = RegInit(0.U.asTypeOf(Vec(NumReg, UInt((params.Parameters.DatWidth).W))))
+    val RF      = RegInit(0.U.asTypeOf(Vec(NumReg, UInt((params.Parameters.DataWidth).W))))
 
     //Pipeline Registers
     val exe     = RegInit(Bool(), false.B)                      //Exec Validation
-    val rs1     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Val. for Source-1
-    val rs2     = Reg(UInt((params.Parameters.DatWidth).W))     //RegisterFile Val. for Source-2
-    val r_imm   = Reg(UInt((params.Parameters.DatWidth).W))     //Immediate
+    val rs1     = Reg(UInt((params.Parameters.DataWidth).W))    //RegisterFile Val. for Source-1
+    val rs2     = Reg(UInt((params.Parameters.DataWidth).W))    //RegisterFile Val. for Source-2
+    val r_imm   = Reg(UInt((params.Parameters.DataWidth).W))    //Immediate
     val opcode  = Reg(UInt((params.Parameters.OpcWidth).W))     //Opcode
 
     val rn1     = Reg(UInt((params.Parameters.LogNumReg).W))    //RegisterFile No. for Source-1
@@ -40,7 +40,7 @@ class REG extends Module {
 
 
     /* Wire                             */
-    val imm     = Wire(UInt((params.Parameters.DatWidth).W))    //Immediate
+    val imm     = Wire(UInt((params.Parameters.DataWidth).W))    //Immediate
 
 
     /* Assign                           */

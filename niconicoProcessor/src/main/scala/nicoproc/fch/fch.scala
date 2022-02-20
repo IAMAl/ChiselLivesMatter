@@ -13,7 +13,7 @@ class FCH extends Module {
 
 
     /* I/O                              */
-    val io  = IO(new FCH_IO)
+    val io      = IO(new FCH_IO)
 
 
     /* Module                           */

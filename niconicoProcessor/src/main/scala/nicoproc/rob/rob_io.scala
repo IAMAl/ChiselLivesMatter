@@ -8,7 +8,7 @@ import chisel3.util._
 import params._
 
 class ROB_IO extends Bundle {
-    val DatWidth    = params.Parameters.DatWidth
+    val DataWidth   = params.Parameters.DataWidth
     val LogNumReg   = params.Parameters.PLogNumReg
 
     val i_vld       = Input( Bool())            //
@@ -25,22 +25,22 @@ class ROB_IO extends Bundle {
     val i_wrn_b     = Input( UInt(LogNumReg.W)) //WB Reg No from BRU
     val i_wrn_m     = Input( UInt(LogNumReg.W)) //WB Reg No from LSU
 
-    val i_dat_c     = Input( UInt(DatWidth.W))  //WB Data from CSU
-    val i_dat_a     = Input( UInt(DatWidth.W))  //WB Data from ALU
-    val i_dat_b     = Input( UInt(DatWidth.W))  //WB Data from BRU
-    val i_dat_m     = Input( UInt(DatWidth.W))  //WB Data from LSU
+    val i_dat_c     = Input( UInt(DataWidth.W)) //WB Data from CSU
+    val i_dat_a     = Input( UInt(DataWidth.W)) //WB Data from ALU
+    val i_dat_b     = Input( UInt(DataWidth.W)) //WB Data from BRU
+    val i_dat_m     = Input( UInt(DataWidth.W)) //WB Data from LSU
 
     val i_rs1       = Input( UInt(LogNumReg.W)) //Bypass Reg No
     val i_rs2       = Input( UInt(LogNumReg.W)) //Bypass Reg No
 
-    val o_dat1      = Output(UInt(DatWidth.W))  //Bypass Data
-    val o_dat2      = Output(UInt(DatWidth.W))  //Bypass Data
+    val o_dat1      = Output(UInt(DataWidth.W)) //Bypass Data
+    val o_dat2      = Output(UInt(DataWidth.W)) //Bypass Data
 
     val o_bps1      = Output(Bool())            //Bypass Enable
     val o_bps2      = Output(Bool())            //Bypass Enable
 
     val o_full      = Output(Bool())
     val o_wrn       = Output(UInt(LogNumReg.W)) //WB Reg No
-    val o_dat       = Output(UInt(DatWidth.W))  //WB Data
+    val o_dat       = Output(UInt(DataWidth.W)) //WB Data
     val o_wrb       = Output(Bool())            //WB Req
 }

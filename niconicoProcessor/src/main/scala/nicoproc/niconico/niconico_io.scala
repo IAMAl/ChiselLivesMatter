@@ -7,18 +7,23 @@ import chisel3.util._
 
 import params._
 
-class NICO2_IO extends Bundle {  
-    val boot = Input( Bool())                               //Boot Signal
+class NICO2_IO extends Bundle {
+    
+    val ISAWidth    = params.Parameters.ISAWidth
+    val DataWidth   = params.Parameters.DataWidth
+    val AddrWidth   = params.Parameters.AddrWidth
 
-    val ireq = Output(Bool())                               //Instruction Fetch Request
-    val iack = Input( Bool())                               //Fetch Acknowledge
-    val iadr = Output(UInt(params.Parameters.AddrWidth.W))  //Instruction Address (PC)
-    val inst = Input( UInt(params.Parameters.ISAWidth.W))   //Instruction Port
+    val boot = Input( Bool())             //Boot Signal
 
-    val dreq = Output(Bool())                               //Memory Access Request
-    val dack = Input( Bool())                               //Memory Access Acknowledge
-    val stor = Output(Bool())                               //Store Flag
-    val mar  = Output(UInt(params.Parameters.AddrWidth.W))  //Memory Address Port
-    val idat = Input( UInt(params.Parameters.DatWidth.W))   //Loading Port
-    val odat = Output(UInt(params.Parameters.DatWidth.W))   //Storing Port
+    val ireq = Output(Bool())             //Instruction Fetch Request
+    val iack = Input( Bool())             //Fetch Acknowledge
+    val iadr = Output(UInt(AddrWidth.W))  //Instruction Address (PC)
+    val inst = Input( UInt(ISAWidth.W))   //Instruction Port
+
+    val dreq = Output(Bool())             //Memory Access Request
+    val dack = Input( Bool())             //Memory Access Acknowledge
+    val stor = Output(Bool())             //Store Flag
+    val mar  = Output(UInt(AddrWidth.W))  //Memory Address Port
+    val idat = Input( UInt(DataWidth.W))  //Loading Port
+    val odat = Output(UInt(DataWidth.W))  //Storing Port
 }

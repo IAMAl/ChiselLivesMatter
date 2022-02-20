@@ -14,7 +14,7 @@ class BRU extends Module {
     val JAL         = params.Parameters.OP_JAL.U
     val JALR        = params.Parameters.OP_JALR.U
     val AddrWidth   = params.Parameters.AddrWidth
-    val DatWidth    = params.Parameters.DatWidth
+    val DataWidth   = params.Parameters.DataWidth
     val LogNumReg   = params.Parameters.LogNumReg
 
 
@@ -27,7 +27,7 @@ class BRU extends Module {
     val PC      = RegInit(UInt(AddrWidth.W), InitPC)
 
     //Link Value
-    val dst     = Reg(UInt(DatWidth.W))
+    val dst     = Reg(UInt(DataWidth.W))
 
     //Branch Condition
     val brc     = Reg(Bool())

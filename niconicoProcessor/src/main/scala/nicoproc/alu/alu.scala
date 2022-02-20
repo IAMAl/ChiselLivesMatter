@@ -9,20 +9,25 @@ import params._
 
 class ALU extends Module {
 
+    val Fc3Width    = params.Parameters.Fc3Width
+    val Fc7Width    = params.Parameters.Fc7Width
+    val DataWidth   = params.Parameters.DataWidth
+    val PLogNumReg  = params.Parameters.PLogNumReg
+
 
     /* I/O                                  */
     val io = IO(new Bundle {
-        val i_vld       = Input( Bool())                                // Exec Validation
-        val i_rs1       = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-1
-        val i_rs2       = Input( UInt((params.Parameters.DatWidth).W))  // RegisterFile Source-2
-        val i_imm       = Input( UInt((params.Parameters.DatWidth).W))  // Immediate
-        val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))  // Immediate (Func3)
-        val i_fc7       = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
-        val i_wrn       = Input( UInt((params.Parameters.LogNumReg+1).W)) // Write-Back Index
-        val o_wrn       = Output(UInt((params.Parameters.LogNumReg+1).W)) // Write-Back Index
-        val o_dst       = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
-        val o_wrb       = Output(Bool())                                // Writeback Request
-        val i_UID       = Input( UInt(3.W))                             // Operation Unit ID
+        val i_vld       = Input( Bool())                // Exec Validation
+        val i_rs1       = Input( UInt(DataWidth.W))     // RegisterFile Source-1
+        val i_rs2       = Input( UInt(DataWidth.W))     // RegisterFile Source-2
+        val i_imm       = Input( UInt(DataWidth.W))     // Immediate
+        val i_fc3       = Input( UInt(Fc3Width.W))      // Immediate (Func3)
+        val i_fc7       = Input( UInt(Fc7Width.W))      // Immediate (Func7)
+        val i_wrn       = Input( UInt(PLogNumReg.W))    // Write-Back Index
+        val o_wrn       = Output(UInt(PLogNumReg.W))    // Write-Back Index
+        val o_dst       = Output(UInt(DataWidth).W))    // RegisterFile Destination
+        val o_wrb       = Output(Bool())                // Writeback Request
+        val i_UID       = Input( UInt(3.W))             // Operation Unit ID
     })
 
 

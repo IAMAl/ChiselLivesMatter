@@ -10,8 +10,8 @@ import isa._
 
 class Sft extends Module {
 
-
     val LogDWidth   = params.Parameters.LogDWidth
+
 
     /* I/O                                  */
     val io = IO(new ALU_IO)

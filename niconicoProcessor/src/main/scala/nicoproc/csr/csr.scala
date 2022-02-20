@@ -17,7 +17,7 @@ class CSU extends Module {
     val FC3_CSRRCI  = params.Parameters.FC3_CSRRWI.U
     val NumReg      = params.Parameters.NumReg
     val LogNumReg   = params.Parameters.LogNumReg
-    val DatWidth    = params.Parameters.DatWidth
+    val DataWidth   = params.Parameters.DataWidth
 
 
     /* I/O                              */
@@ -26,11 +26,11 @@ class CSU extends Module {
     /* Register                         */
     //Register File
     //4x32x32 Bank Configuration
-    val CSR     = RegInit(0.U.asTypeOf(Vec(2, Vec(NumReg, Vec(NumReg, UInt(DatWidth.W))))))
+    val CSR     = RegInit(0.U.asTypeOf(Vec(2, Vec(NumReg, Vec(NumReg, UInt(DataWidth.W))))))
 
 
      /* Wire                             */
-    val csr     = Wire(UInt(DatWidth.W))    //CSR-Output
+    val csr     = Wire(UInt(DataWidth.W))    //CSR-Output
     val imm_z   = Wire(UInt(5.W))           //Immediate
     val idx     = Wire(UInt(12.W))          //Index
 

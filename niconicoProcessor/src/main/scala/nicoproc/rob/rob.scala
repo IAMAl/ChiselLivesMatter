@@ -11,13 +11,13 @@ import params._
 
 
 class Entry (
-        DatWidth:   Int,
+        DataWidth:  Int,
         LogNumReg:  Int
     ) extends Bundle {
     val V       = RegInit(Bool(), false.B)
     val W       = RegInit(Bool(), false.B)
     val WBRN    = Reg(UInt(LogNumReg.W))
-    val Data    = Reg(UInt(DatWidth.W))
+    val Data    = Reg(UInt(DataWidth.W))
 }
 
 
@@ -90,7 +90,7 @@ class BuffCtrl (
 
 class ROB extends Module {
 
-    val DatWidth    = params.Parameters.DatWidth
+    val DataWidth   = params.Parameters.DataWidth
     val LogNumReg   = params.Parameters.LogNumReg+1
     val BUFFLENGTH  = params.Parameters.BUFFLENGTH
     val BUFFWIDTH   = log2Ceil(BUFFLENGTH)
@@ -105,9 +105,9 @@ class ROB extends Module {
     val BFCTRL      = Module(new BuffCtrl(BUFFLENGTH))
 
     // Power of 2 Depth Circular Buffer Memory
-    val BUFF        = Vec(BUFFLENGTH, new Entry(DatWidth, LogNumReg))
+    val BUFF        = Vec(BUFFLENGTH, new Entry(DataWidth, LogNumReg))
 
-    val PostDat     = new Entry(DatWidth, LogNumReg)// Output from Memory
+    val PostDat     = new Entry(DataWidth, LogNumReg)// Output from Memory
 
     val Valid       = RegInit(Bool(), false.B)      // Capture Valid
     val Full        = RegInit(Bool(), false.B)      // Capture Full

@@ -16,7 +16,7 @@ class Add extends Module {
 
 
     /* Wire                             */
-    val rs2     = Wire(UInt((params.Parameters.DatWidth).W))
+    val rs2     = Wire(UInt((params.Parameters.DataWidth).W))
     val c_in    = Wire(UInt(1.W))
 
 

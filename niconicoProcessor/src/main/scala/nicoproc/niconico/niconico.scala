@@ -8,7 +8,7 @@ import chisel3.util._
 
 import fch._
 import route._
-import RRU._
+import rru._
 import bru._
 import reg._
 import alu._
