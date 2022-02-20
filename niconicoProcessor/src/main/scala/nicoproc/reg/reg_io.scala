@@ -15,20 +15,20 @@ class REG_IO extends Bundle {
     val i_re1   = Input( Bool())                                    //Register Read Enable-1
     val i_re2   = Input( Bool())                                    //Register Read Enable-2
 
-    val i_wno   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Write No
-    val i_rn1   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Read No-1
-    val i_rn2   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Read No-2
+    val i_wno   = Input(UInt((params.Parameters.LogNumReg+1).W))    //Register Write No
+    val i_rn1   = Input(UInt((params.Parameters.LogNumReg+1).W))    //Register Read No-1
+    val i_rn2   = Input(UInt((params.Parameters.LogNumReg+1).W))    //Register Read No-2
     val i_fc3   = Input(UInt((params.Parameters.Fc3Width).W))       //Function-3 Port
     val i_fc7   = Input(UInt((params.Parameters.Fc7Width).W))       //Function-7 Port
 
-    val o_rn1   = Output(UInt((params.Parameters.LogNumReg).W))     //Register Read No-1
-    val o_rn2   = Output(UInt((params.Parameters.LogNumReg).W))     //Register Read No-2
+    val o_rn1   = Output(UInt((params.Parameters.LogNumReg+1).W))   //Register Read No-1
+    val o_rn2   = Output(UInt((params.Parameters.LogNumReg+1).W))   //Register Read No-2
     val o_fc3   = Output(UInt((params.Parameters.Fc3Width).W))      //Function-3 Port
     val o_fc7   = Output(UInt((params.Parameters.Fc7Width).W))      //Function-7 Port
     val o_imm   = Output(UInt((params.Parameters.DatWidth).W))      //Immediate
 
     val i_wrb_r = Input(Bool())                                     //Write-back Req.
-    val i_wrn   = Input(UInt((params.Parameters.LogNumReg).W))      //Register Write No
+    val i_wrn   = Input(UInt((params.Parameters.LogNumReg+1).W))    //Register Write No
     val i_wrb_d = Input(UInt((params.Parameters.DatWidth).W))       //Write-back Data
 
     val i_pc    = Output(UInt((params.Parameters.AddrWidth).W))     //Program Counter (PC) Port

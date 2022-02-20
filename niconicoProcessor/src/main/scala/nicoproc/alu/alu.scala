@@ -18,8 +18,8 @@ class ALU extends Module {
         val i_imm       = Input( UInt((params.Parameters.DatWidth).W))  // Immediate
         val i_fc3       = Input( UInt((params.Parameters.Fc3Width).W))  // Immediate (Func3)
         val i_fc7       = Input( UInt((params.Parameters.Fc7Width).W))  // Immediate (Func7)
-        val i_wrn       = Input( UInt((params.Parameters.LogNumReg).W)) // Write-Back Index
-        val o_wrn       = Output(UInt((params.Parameters.LogNumReg).W)) // Write-Back Index
+        val i_wrn       = Input( UInt((params.Parameters.LogNumReg+1).W)) // Write-Back Index
+        val o_wrn       = Output(UInt((params.Parameters.LogNumReg+1).W)) // Write-Back Index
         val o_dst       = Output(UInt((params.Parameters.DatWidth).W))  // RegisterFile Destination
         val o_wrb       = Output(Bool())                                // Writeback Request
         val i_UID       = Input( UInt(3.W))                             // Operation Unit ID

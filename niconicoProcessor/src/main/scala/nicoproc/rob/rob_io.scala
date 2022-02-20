@@ -9,7 +9,7 @@ import params._
 
 class ROB_IO extends Bundle {
     val DatWidth    = params.Parameters.DatWidth
-    val LogNumReg   = params.Parameters.LogNumReg
+    val LogNumReg   = params.Parameters.PLogNumReg
 
     val i_vld       = Input( Bool())            //
     val i_set       = Input( Bool())            //Set WB Reg No

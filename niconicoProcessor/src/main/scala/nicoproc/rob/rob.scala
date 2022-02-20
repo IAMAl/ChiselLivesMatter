@@ -91,7 +91,7 @@ class BuffCtrl (
 class ROB extends Module {
 
     val DatWidth    = params.Parameters.DatWidth
-    val LogNumReg   = params.Parameters.LogNumReg
+    val LogNumReg   = params.Parameters.LogNumReg+1
     val BUFFLENGTH  = params.Parameters.BUFFLENGTH
     val BUFFWIDTH   = log2Ceil(BUFFLENGTH)
 

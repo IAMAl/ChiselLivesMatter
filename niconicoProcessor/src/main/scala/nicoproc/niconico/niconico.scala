@@ -8,7 +8,7 @@ import chisel3.util._
 
 import fch._
 import route._
-import sch._
+import RRU._
 import bru._
 import reg._
 import alu._
@@ -26,7 +26,7 @@ class NicoNico extends Module {
     /* Module                       	*/
     //Front-End
     val FCH = Module(new FCH)     		//Instruction Fetch Unit
-    val SCH = Module(new SCH)     		//Scheduler
+    val RRU = Module(new RRU)     		//Register Rename
     val REG = Module(new REG)     		//Register File
 
     //F/B Routing
@@ -46,30 +46,30 @@ class NicoNico extends Module {
     FCH.io.i_boot	:= io.boot			//Kick-Start (High-Active)
     FCH.io.i_ifch 	:= io.inst      	//Input 32b Word Instruction
     FCH.io.i_brc  	:= BRU.io.o_brc 	//Flush by Branch Taken
-    FCH.io.i_stall	:= SCH.io.o_hzd ||  //Stall by Hazard
+    FCH.io.i_stall	:= RRU.io.o_hzd ||  //Stall by Hazard
 						ROB.io.o_full   //or by Full in ROB
 
 
     //Stage-2
-    //Scheduler
-    SCH.io.i_vld  	:= FCH.io.o_exe 	//Validate Scheduler
-    SCH.io.i_ins  	:= FCH.io.o_ins 	//Feed Instruction Word
+    //Register Rename
+    RRU.io.i_vld  	:= FCH.io.o_exe 	//Validate Scheduler
+    RRU.io.i_ins  	:= FCH.io.o_ins 	//Feed Instruction Word
 
 
     //Stage-3
     //Register-Read
-    REG.io.i_vld  	:= SCH.io.o_exe 	//Validate Register File
-    REG.io.i_opc  	:= SCH.io.o_opc 	//Opcode
-    REG.io.i_re1  	:= SCH.io.o_re1 	//Read Enable-1
-    REG.io.i_re2  	:= SCH.io.o_re2 	//Read Enable-2
-    REG.io.i_rn1  	:= SCH.io.o_rn1 	//Read Register Number-1
-    REG.io.i_rn2  	:= SCH.io.o_rn2 	//Read Register Number-2
-    REG.io.i_fc3  	:= SCH.io.o_fc3 	//Func3 Value
-    REG.io.i_fc7  	:= SCH.io.o_fc7 	//Func7 Value
-    REG.io.i_wno  	:= SCH.io.o_wno 	//Write Register Number
+    REG.io.i_vld  	:= RRU.io.o_exe 	//Validate Register File
+    REG.io.i_opc  	:= RRU.io.o_opc 	//Opcode
+    REG.io.i_re1  	:= RRU.io.o_re1 	//Read Enable-1
+    REG.io.i_re2  	:= RRU.io.o_re2 	//Read Enable-2
+    REG.io.i_rn1  	:= RRU.io.o_rn1 	//Read Register Number-1
+    REG.io.i_rn2  	:= RRU.io.o_rn2 	//Read Register Number-2
+    REG.io.i_fc3  	:= RRU.io.o_fc3 	//Func3 Value
+    REG.io.i_fc7  	:= RRU.io.o_fc7 	//Func7 Value
+    REG.io.i_wno  	:= RRU.io.o_wno 	//Write Register Number
 
     //Route to Exec Units
-    URT.io.i_opc  	:= SCH.io.o_opc 	//Routing by Opcode
+    URT.io.i_opc  	:= RRU.io.o_opc 	//Routing by Opcode
 
 
     //Stage-4
@@ -104,8 +104,8 @@ class NicoNico extends Module {
 
     //Stage-5
     //Write-Back
-	ROB.io.i_set    := SCH.io.o_exe
-    ROB.io.i_wrn    := SCH.io.o_wno
+	ROB.io.i_set    := RRU.io.o_exe
+    ROB.io.i_wrn    := RRU.io.o_wno
 
     ROB.io.i_wrb_c  := CSU.io.o_wrb
     ROB.io.i_wrb_a  := ALU.io.o_wrb
@@ -122,8 +122,8 @@ class NicoNico extends Module {
     ROB.io.i_dat_b  := BRU.io.o_dst
     ROB.io.i_dat_m  := LSU.io.o_dst
 
-    ROB.io.i_rs1	:= SCH.io.o_rn1
-    ROB.io.i_rs2    := SCH.io.o_rn2
+    ROB.io.i_rs1	:= RRU.io.o_rn1
+    ROB.io.i_rs2    := RRU.io.o_rn2
 
 
 	//Commit

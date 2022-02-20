@@ -23,6 +23,10 @@ object Parameters {
     //Register File Size
     val NumReg          = 32
     val LogNumReg       = log2Ceil(NumReg)
+    
+    //Physical Register File Size
+    val PNumReg         = 48
+    val PLogNumReg      = log2Ceil(PNumReg)
 
     //Instruction Bit Field Definition
     val LSB_Opc         = 0
