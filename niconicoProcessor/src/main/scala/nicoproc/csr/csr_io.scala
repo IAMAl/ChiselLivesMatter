@@ -23,5 +23,5 @@ class CSR_IO extends Bundle {
     val i_wrn = Input( UInt(PLogNumReg.W))  //Write-Back Index
     val o_wrn = Output(UInt(PLogNumReg.W))  //Write-Back Index
     val o_dst = Output(UInt(DataWidth.W))   //Destination Operand Port
-    val o_wrb = Output(Bool())              \//Writeback Request
+    val o_wrb = Output(Bool())              //Writeback Request
 }

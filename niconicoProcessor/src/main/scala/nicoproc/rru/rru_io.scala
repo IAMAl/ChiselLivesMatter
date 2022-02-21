@@ -18,7 +18,7 @@ class RRU_IO extends Bundle {
     val i_vld = Input( Bool())              //Input Validation
     val i_ins = Input( UInt(ISAWidth.W))    //Fetched Instruction Port
 
-    val o_opc = Output(UInt(OpcWidth).W)    //Opcode
+    val o_opc = Output(UInt(OpcWidth.W))    //Opcode
     val o_rn1 = Output(UInt(PLogNumReg.W))  //Read Register No-1
     val o_rn2 = Output(UInt(PLogNumReg.W))  //Read Register No-2
     val o_wno = Output(UInt(PLogNumReg.W))  //Write Register No

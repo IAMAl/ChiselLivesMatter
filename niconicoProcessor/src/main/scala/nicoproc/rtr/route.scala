@@ -30,11 +30,15 @@ class URT extends Module {
 
 
     /* Register                         */
-    val UnitID  = Reg(UInt(3.W))
+    
     val is_CSU  = Reg(Bool())
     val is_ALU  = Reg(Bool())
     val is_LSU  = Reg(Bool())
     val is_BRU  = Reg(Bool())
+
+    /* Wire                             */
+    val UnitID  = Wire(UInt(3.W))
+    
 
     val EnWB    = RegInit(Bool(), false.B)
 

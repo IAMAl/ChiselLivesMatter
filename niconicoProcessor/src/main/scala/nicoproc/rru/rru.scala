@@ -6,6 +6,7 @@ import chisel3._
 import chisel3.util._
 
 import params._
+import isa._
 import route._
 
 
@@ -17,7 +18,7 @@ class Encoder_ (
     /* I/O                                                  */
     val io = IO(new Bundle {
         val i_data  = Input( Vec(NumInputs, Bool()))        // Set of Signal
-        val o_enc   = Output(UInt(log2Ceil(NumInputs).W))   // Encoded No.
+        val o_enc   = Output(UInt((log2Ceil(NumInputs)).W)) // Encoded No.
     })
 
 
@@ -147,21 +148,21 @@ class Arbiter_ (
         when (io.i_req(in_no) && !invalid(in_no).reduce(_ | _).asBool && !v_exist) {
             valid(in_no)    := true.B
         }
+        Encoder.io.i_data   := io.i_req(in_no) && !invalid(in_no).reduce(_ | _).asBool && !v_exist
     }
 
 
     //// Output Grant                                       ////
-    Encoder.io.i_data   := io.i_req(in_no) && !invalid(in_no).reduce(_ | _).asBool && !v_exist
     io.o_grt            := Encoder.io.o_enc
 
-    ////
-    io.o_full           := valid.redule(_ & _).asBool
-    io.o_empty          := !(valid.redule(_ | _).asBool)
+
+    //// Ourput Flag
+    io.o_full           := valid.asUInt.andR
+    io.o_empty          := !(valid.asUInt() =/= 0.U)
 }
 
 
 class RenameEntry (
-        DataWidth:  Int,
         LogNumReg:  Int
     ) extends Bundle {
     val RFN         = Reg(UInt(LogNumReg.W))
@@ -177,35 +178,43 @@ class RRU extends Module {
     val OpcWidth    = params.Parameters.OpcWidth
     val Fc3Width    = params.Parameters.Fc3Width
     val Fc7Width    = params.Parameters.Fc7Width
+    val DataWidth   = params.Parameters.DataWidth
     val LogNumReg   = params.Parameters.LogNumReg
     val PNumReg     = params.Parameters.PNumReg
     val PLogNumReg  = params.Parameters.PLogNumReg
 
 
     /* I/O                              */
-    val io = IO(new SCH_IO)
+    val io = IO(new RRU_IO)
 
 
     /* Module                           */
-    val ISplit  = Module(new ISplit)
+    val ISplit      = Module(new ISplit)
 
-    val Arbiter = Module(new Arbiter_(PNumReg))
+    //Opcode Bit-Field Extraction
+    val ISA_Opcode  = Module(new ISA_Opcode)
+
+    //Rename Handler
+    val Arbiter     = Module(new Arbiter_(PNumReg))
+    val Encoder     = Module(new Encoder_(PLogNumReg))
+    val Decoder     = Module(new Decoder_(PLogNumReg))
 
 
     /* Register                         */
-    val Vld         = RegInit(Bool(), false.B)
-    val Opc         = Reg(UInt(OpcWidth.W))
-    val Wno         = Reg(UInt(PLogNumReg.W))
-    val Rn1         = Reg(UInt(PLogNumReg.W))
-    val Rn2         = Reg(UInt(PLogNumReg.W))
-    val Fc3         = Reg(UInt(Fc3Width.W))
-    val Fc7         = Reg(UInt(Fc7Width.W))
-    val Re1         = RegInit(Bool(), false.B)
-    val Re2         = RegInit(Bool(), false.B)
-    val EnWB        = RegInit(Bool(), false.B)
-    val Hzd         = RegInit(Bool(), false.B)
+    val Vld         = RegInit(Bool(), false.B)  //Validation for Next Stage
+    val Opc         = Reg(UInt(OpcWidth.W))     //Opcode
+    val Wno         = Reg(UInt(PLogNumReg.W))   //Write-Back Register No.
+    val Rn1         = Reg(UInt(PLogNumReg.W))   //Source Register No.
+    val Rn2         = Reg(UInt(PLogNumReg.W))   //Source REgister No.
+    val Fc3         = Reg(UInt(Fc3Width.W))     //Func3
+    val Fc7         = Reg(UInt(Fc7Width.W))     //Func7
+    val Re1         = RegInit(Bool(), false.B)  //Read-Enable
+    val Re2         = RegInit(Bool(), false.B)  //Read-Enable
+    val EnWB        = RegInit(Bool(), false.B)  //Write-Back Enable
+    val Hzd         = RegInit(Bool(), false.B)  //Hazard for Cond-Branch
 
-    val RRFN        = Reg(Vec(PNumReg, new Module(RenameEntry(DataWidth, PLogNumReg))))
+    //Rename Table
+    val RRFN        = Reg(Vec(PNumReg, new RenameEntry(PLogNumReg)))
 
 
     /* Wire                             */
@@ -228,6 +237,9 @@ class RRU extends Module {
     //Use of Register File
     val reg_req     = Wire(Bool())
 
+    //Back-End Unit ID
+    val UnitID      = Wire(UInt(3.W))
+
 
     /* Assign                           */
     //Instruction Split
@@ -239,30 +251,37 @@ class RRU extends Module {
     rn1     := ISplit.io.o_rn1
     rn2     := ISplit.io.o_rn2
 
-    //
+    ISA_Opcode.io.i_opc := opc
+    UnitID      := ISA_Opcode.io.o_OpcodeType
+
+    //Flag: Instruction is Conditional Branch
     cond        := (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U)
 
-    //Reading Immediate (WN) at Store or Branch
+    //Flag: Reading Immediate (WN) at Store or Branch
     imm_dst     := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_STORE).U) ||
                     (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U))
 
-    //Reading Immediate (RN1/RN2) at Link, Branch or ALU
+    //Flag: Reading Immediate (RN1/RN2) at Link, Branch or ALU
     imm_src     := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_JAL).U)   ||
                     (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U) ||
                     (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_RandI).U))
 
-    ////Register Renaming
+
+    //// Register Renaming
     //Flag: Write-Back to Register File
     reg_req             := !imm_dst
-    Decoder.i_req       := io.i_wrb
-    Decoder.i_wrn       := io.i_wbn
+
+    //Register to Rename Table
+    Decoder.io.i_req    := io.i_wrb
+    Decoder.io.i_wrn    := io.i_wbn
     Arbiter.io.i_req    := io.i_vld && (reg_req || cond)
-    Arbiter.io.I_Rls    := Decoder.o_grt
+    Arbiter.io.I_Rls    := Decoder.io.o_grt
     full                := Arbiter.io.o_full
     empty               := Arbiter.io.o_empty
-    for (idx<- until PNumReg) {
+    for (idx<-0 until PNumReg) {
         when (io.i_vld && reg_req && !full) {
             when (cond) {
+                //Conditional Branch then use this entry as a Flag
                 RRFN(Arbiter.io.o_grt).RFN  := (PNumReg-1).U
             }
             .otherwise {
@@ -270,7 +289,7 @@ class RRU extends Module {
             }
         }
     }
-    Wno         := Decoder.o_grt
+    Wno         := Decoder.io.o_grt
 
     //Write-Back Enable Assertion
     when (  (UnitID === (params.Parameters.OP_RandI).U) ||
@@ -284,6 +303,10 @@ class RRU extends Module {
     .otherwise {
         EnWB    := false.B
     }
+
+
+    //// Output
+    //Write-Back Request
     io.o_wrb    := EnWB
 
     //Register File Read-Enable
@@ -293,12 +316,12 @@ class RRU extends Module {
     io.o_re2    := Re2
 
     //Output Renamed Register No.
-    for (idx<-0 until NumInputs) {
+    for (idx<-0 until PLogNumReg) {
         when (rn1 === RRFN(idx).RFN) {
-            Rn1 := RRFN(idx).RenamedWRN
+            Rn1 := RRFN(idx).RFN
         }
         when (rn2 === RRFN(idx).RFN) {
-            Rn2 := RRFN(idx).RenamedWRN
+            Rn2 := RRFN(idx).RFN
         }
         when ((PNumReg-1).U === RRFN(idx).RFN) {
             hzrd(idx)   := Arbiter.io.o_vld(idx)
@@ -307,7 +330,7 @@ class RRU extends Module {
             hzrd(idx)   := false.B
         }
     }
-    Hzd         := hzrd.redule(_ | _).asBool
+    Hzd         := (hzrd.asUInt() =/= 0.U)
 
     //Function Command
     when (io.i_vld) {
@@ -322,7 +345,7 @@ class RRU extends Module {
     io.o_fc3    := Fc3
     io.o_fc7    := Fc7
 
-    //Active-flag for Branch Unit
+    //Flag: Conditional Branch is in Pipeline
     io.o_hzd    := Hzd
 
     //Execution Enable on Back-End Pipeline

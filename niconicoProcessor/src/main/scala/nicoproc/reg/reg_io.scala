@@ -50,4 +50,5 @@ class REG_IO extends Bundle {
     val o_cs2   = Output(UInt(DataWidth.W))     //CSR Operand-2 Port
 
     val o_opcode= Output(UInt(OpcWidth.W))      //Opcode
+    val o_exe   = Output(Bool())                //
 }
