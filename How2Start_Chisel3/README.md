@@ -2,10 +2,13 @@
 Chisel3 for Beginners; How to begin coding with hardware description language
 
 ## Target People for This Document
-Beginners who have not experience about Chisel and Scala programming languages. Almost hardware engineers are categorized in this type.
+Beginners who have not experience about Chisel and Scala programming languages.
+Almost hardware engineers are categorized in this type.
 
 ## What is Chisel?
-Chisel is to generate HDL code from high-level language, which is made with wrapping Scala language. Scala is made on Java virtual machine. Current version is Chisel3. Because the Java is object-oriented language, **class** in chisel code is converted to HDL, *Verilog-HDL*.
+Chisel is to generate HDL code from high-level language, which is made with wrapping Scala language.
+Scala is made on Java virtual machine.
+Current version is Chisel3. Because the Java is object-oriented language, **class** in chisel code is converted to HDL, *Verilog-HDL*.
 
 ## Prerequisites
 
@@ -21,25 +24,28 @@ Prerequisites to run are;
 ```
   java -version
 ```
-  If java does not exist in your computer, case of MacOS, you can install through **homebrew**. Case of ubuntu, you can use **apt**. SBT is based on *open sourced* Java, not on Oracle's one, see;
-  https://openjdk.java.net/  
+  If java does not exist in your computer, case of MacOS, you can install through **homebrew**. Case of ubuntu, you can use **apt**.
+ 
 
-- SBT (installation instructions)
+- SBT
 
-  Installation instruction is well descrived in this web-page;
-  https://github.com/freechipsproject/chisel3/wiki/Installation-Preparation  
-  SBT's dependency calls openJDK at its installation, even if you have installed Oracle's Java at default setting.
+ SBT can also be installed with homebrew (mac) and apt (ubuntu).
+ ```
+ brew install sbt
+ ```
 
 ## Installations
 
 **NOTE**: Before installation, you need to check you are one of which user types;
   - **Ordinary** user (let us say simply *user*) who wants to compile their chisel code to generate HDL, so they want to use chisel as a common tool, they should use **released** chisel. 
-  - **Deveropper** user (let us call a *developer*) who needs advanced tool which is not yet released (ex. they might want **rc** version), and or want to costomize the tools for their purpose. They might want **pre-released** chisel.
+  - **Deveropper** user (let us call a *developer*) who needs advanced tool which is not yet released (ex. they might want **rc** version), and or want to costomize the tools for their purpose.
+  They might want **pre-released** chisel.
 
 
 ### Installation for Ordinary Users
 
-  By using *template* of **build.sbt**, SBT invokes necessary **released** *tool softwares defined in the build.sbt* through internet (**so, network connection is necessary**). Template is always upto-date, so ordinary users need not to manual installation works. Template is here;
+  By using *template* of **build.sbt**, SBT invokes necessary **released** *tool softwares defined in the build.sbt* through internet (**so, network connection is necessary**). Template is always upto-date, so ordinary users need not to manual installation works.
+  Template is here;
 
   https://github.com/freechipsproject/chisel-template
 
@@ -48,7 +54,8 @@ By doing **copy and paste** the template's build.sbt into your project directory
 
 ### Installation for Developper Users
 
-To install chisel, etc to your local computer, you need to compile source code of chisel, treadle, firrtl, etc, and assemble these. These need doing following command in the directory;
+To install chisel, etc, to your local computer, you need to compile source code of chisel, treadle, firrtl, etc, and assemble these.
+To compile, you need doing following command in the directory;
 ```
   sbt compile
 ```
@@ -64,8 +71,8 @@ sbt publishLocal
 
 - Stable Version of Recent Chisel
   
-  Stable Recent Version: 3.4.0
-  https://github.com/freechipsproject/chisel3/releases/tag/v3.4.0
+  Stable Recent Version: 3.5.0
+  https://github.com/freechipsproject/chisel3/releases/tag/v3.5.0
 
 - Tags for Recent Versions
 
@@ -81,23 +88,28 @@ sbt publishLocal
 
 - tester2 (chisel-testers)
 
-  tester2 is second generation of verification tool, currently this is on a main stream.
+  tester2 is second generation of verification tool, currently this is a main stream.
 
   https://github.com/freechipsproject/chisel-testers
 
 - Coursier  
   
-  This program based on Java is utility such as installing. We can use the program to install registered API, let us see to install FIRRTL as an example. Coursier can be installed by;
+  This program based on Java is utility such as for installing.
+  We can use the program to install registered API, let us see to install FIRRTL as an example.
+  Coursier can be installed by;
 ```
   curl -fLo cs https://git.io/coursier-cli-linux &&
     chmod +x cs &&
     ./cs
 ```
-  This command is for Linux. program "cs" is generated on current directory. After that we can install FIRRTL which is registered in Coursier, as follows;
+  This command is for Linux.
+  Program "cs" is generated on current directory.
+  After that we can install FIRRTL which is registered in Coursier, as follows;
 ```
   ./cs bootstrap edu.berkeley.cs::firrtl:1.3.2 --main-class firrtl.stage.FirrtlMain -o firrtl-1.3.2
 ```
- This command generates firrtl-1.3.2 (see *-o* option to define name of generation). "firrtl:1.3.2" in the command selects the firrtl" with 1.3.2 version registed in it.
+ This command generates firrtl-1.3.2 (see *-o* option to define name of generation).
+ "firrtl:1.3.2" in the command selects the firrtl" with 1.3.2 version registed in the web-site.
 
 ## Project Directory Structure
 Necessary project directory structure is as follows;
@@ -109,37 +121,46 @@ root--+--build.sbt
               +--test--+--scala--"YOUR_TEST_CODES.scala"
 
 ```
-This is **strict constraint** by SBT, all chisel codes should belong to this directory structure. If you do not take this directory structure, you will meet **ClassNotFound** error, SBT could not find a root directory.
+This is **strict constraint** by SBT, all chisel codes should belong to this directory structure.
+If you do not take this directory structure, you will meet **ClassNotFound** error, SBT could not find a root directory.
 
 ## Compilation
 
-At the compilation, SBT checks directory structure, and so, you do not need to specify which file(s) should be compiled. SBT traces a  *class-dependency* from top-class as a root. This means that you need to specify a *root class*.
+At the compilation, SBT checks directory structure, and so, you do not need to specify which file(s) should be compiled.
+SBT traces a  *class-dependency* from top-class as a root.
+This means that you need to specify a *root class*.
 
 ### Before Your Compilation
 
 You must decide following point before starting your compilation;
 1. [Option] Project Name:  
-  This name can be defined in build.sbt, "name"-field. You can see the name at the compilation, this helps that you work on what project. This is hint for that you have multiple cmopilation points to identify. 
+  This name can be defined in build.sbt, "name"-field. You can see the name at the compilation, this helps that you work on what project.
+  This is hint for that you have multiple cmopilation points to identify. 
 2. Top *class* similar to HDL needs (see bellow):  
-   At the compilation, you need to set **which class** is a *top* module of HDL. So, you can choose preferred class as top module of compiling HDL by specifying the name.
+   At the compilation, you need to set **which class** is a *top* module of HDL.
+   So, you can choose preferred class as top module of compiling HDL by specifying the name.
 3. "YOUR_TEST_CODES.scala" (see bellow)  
    This is needed only for using **iotesters**.
 
 ### Top Class
-Top class description bellow should be added to your a *top-class* file, or a file you want to test/generate HDL. Replace "ProjectName" with your project's name.
+Top class description bellow should be added to your a *top-class* file, or a file you want to test/generate HDL.
+Replace "ProjectName" with your project's name.
 ```
 object ProjectNameMain extends App {
   chisel3.Driver.execute(args,()=>new ProjectName("_args_"))
 }
 ```
-where ```_args_``` are arguments you defined in your class as a succeeded parameter(s) (option). You can do naming this object's name ```ProjectNameMain```, freely. SBT invokes the object ```ProjectNameMain```, and work with the object. This description is needed starting to generate HDL and to test on Chisel.
+where ```_args_``` are arguments you defined in your class as a succeeded parameter(s) (option). You can do naming this object's name ```ProjectNameMain```, freely.
+SBT invokes the object ```ProjectNameMain```, and work with the "root" object.
+This description is needed starting to generate HDL and to test on Chisel.
 
 ### How to Compile Your Code
 Compiling on a terminal is simply as follows;
 ```
 sbt 'run'
 ```
-SBT will query which one you want to compile, then terminal notifies the list with number. You need to tell through number.
+SBT will query which one you want to compile, then terminal notifies the list with number.
+You need to tell through number.
 
 Or, you can specify top class which will be top-module of HDL.
 ```
@@ -165,7 +186,7 @@ The ```runMain``` invokes ```ProjectNameMain``` object and chisel works for this
 ```
   sbt 'testOnly TestClassNameMain'
 ```
-  where ```testOnly TestClassNameMain``` is your class made for testing (test bench)
+  where ```TestClassNameMain``` is your class made for testing (test bench)
 
 
 ### To dump VCD
@@ -195,7 +216,10 @@ where "ProjectName" in the code must be replaced with your project's name. We do
 ## Constraint of Chisel
 
 - **Signed Integer is Default**  
-  If you need 32bit **unsigned** interger, you will meet an error if you take most significant bit. Java have only **signed** integer. You need to use of **BigInt()**. When you assign 32bit integer number to ```UInt``` primitive (eg. I/O, wire) then;
+  If you need 32bit **unsigned** interger, you will meet an error if you take most significant bit.
+  Java have only **signed** integer.
+  You need to use of **BigInt()**.
+  When you assign 32bit integer number to ```UInt``` primitive (eg. I/O, wire, reg, etc) then;
 ```
   Primitive := 0x80000000L.U
 ```
@@ -204,7 +228,8 @@ is simple way, where letaral ```L``` means *signed long*, and literal *U* specif
 ## Small Tips
 
 - **Hexadecimal Numerical Representation**  
-  We often want to use hexadecimal number for coding. Leteral prefix ```0x``` can be used.
+  We often want to use hexadecimal number for coding.
+  You can use leteral prefix ```0x```.
 
 - **Use of Utilities**
 
@@ -224,10 +249,13 @@ is simple way, where letaral ```L``` means *signed long*, and literal *U* specif
 - **Use of Chisel Operators**  
   Chisel's operators are listed in here;  
   https://www.chisel-lang.org/chisel3/operators.html  
-  **Note** that chisel's data type and scala's data type is **different**. If you use Scala's variable as chisel's one, you need to *cast* explicitly.
+  **Note** that chisel's data type and scala's data type is **different**.
+  If you use Scala's variable as chisel's one, you need to *cast* explicitly.
 
 - **Separate HDL file generation**  
-  Chisel generates a single HDL file including all generated RTL module. You may want to generate every classes as separated files. Then you can do with following *SBT* option;
+  Chisel generates a single HDL file including all generated RTL module.
+  You may want to generate every classes (modules in HDL) as separated files.
+  Then you can do with following *SBT* option;
 
 ```
   --split-module
@@ -261,19 +289,26 @@ orR is OR-reduction. Chisel's reductions are listed in here;
   }
 ```
 
-Class ```datum``` has to two primitives; ```valid``` (bool type) and ```data``` (unsigned DataWidth-bit integer). Then you can use the class as a bundled primitive. Then a register ```Datum``` with initialization can be written as follows;
+Class ```datum``` has to two primitives; ```valid``` (bool type) and ```data``` (unsigned DataWidth-bit integer).
+Then you can use the class as a bundled primitive.
+A register ```Datum``` with initialization can be written as follows;
 ```
   val Datum = RegInit(0.U.asTypeOf(new datum(DataWidth)))
 ```
-  Both of valid and data "reg with init var"s in RTL is *zero cleared* (unsigned zero) by hardware "reset" signal. You can specify your preferred initial value. The reset (and also clock) is added automatically to the HDL.
+  Both of valid and data "reg with init var"s in RTL is *zero cleared* (unsigned zero) by hardware "reset" signal.
+  You can specify your preferred initial value.
+  The reset (and also clock) is added automatically to the HDL.
 
 - **Multi-Primitive**  
-  You might want to have multiple instances of a class. ```Vec``` method help us to coding without redundant efforts.
-  For example, ```Port()``` which defines I/O bundling several I/Os, we can define Num Ports as a "port" like this;
+  You might want to have multiple instances of a class.
+  ```Vec``` method help us to coding without redundant efforts.
+  For example, ```Port()``` which defines I/O bundling several I/Os, we can define Num ports as a "port" like this;
 ```
   val io = IO(new Bundle {val port = Vec(Num, new Port(Width))})
 ```
-  Then we can specify identical object such by ```io.port(3).xxx``` for fourth object. **NOTE** that ```3``` is **not** Chisel's data-type, it is Scala's data-type. So, you can combine this description with Scala's coding style (because of Chisel uses Scala language), such as a *for-loop*.
+  Then we can specify identical object such by ```io.port(3).xxx``` for fourth object, for example.
+  **NOTE** that ```3``` is **not** Chisel's data-type, it is Scala's data-type.
+  So, you can combine this description with Scala's coding style (because of Chisel uses Scala language), such as a *for-loop*.
 
 - **Multi-Instance with List**  
   When an adder ```Adder()``` is an instance class defining an adder logic circuit, then we can define "Num" adders like this;
@@ -302,24 +337,28 @@ Class ```datum``` has to two primitives; ```valid``` (bool type) and ```data``` 
 ```
   export _JAVA_OPTIONS=-Xmx2048m
 ```
-  This gives 2048MB (2GiB) for heap memory used in Java. Where ```Xmx``` denotes maximum size, JVM starts from ```Xms``` defined size, and allocates space on demand.
+  This gives 2048MB (2GiB) for heap memory used in Java.
+  Where ```Xmx``` denotes maximum size, JVM starts from ```Xms``` defined size, and allocates space on demand.
   
 
 - [error] "*java.lang.ClassNotFoundException: ProjectName*"
 
-  **Meaning**: There is no ProjectName top module in your source file(s). Or, you might not have correct directory structure.
+  **Meaning**: There is no ```ProjectName``` top module in your source file(s). Or, you might not have correct directory structure.
 
-  **Solution**: Check top module name. Or,check directory structure which is needed for SBT.
+  **Solution**: Check top module name.
+  Or,check directory structure which is needed for SBT.
 
 - [exception] "*CheckInitialization$RefNotInitializedException*"
 
-  **Meaning**: If your code does have unknown state on the port "PortName" (or, wire) in switch statement, the exception might caused by FIRRTL's procedure. This is caused on io or wire, because these should have all statement clearlly. Implicit-state on these primitives make the error (so, *register* does not make the error because it can hold its value).
+  **Meaning**: If your code does have unknown state on the port "PortName" (or, wire) in switch statement, the exception might caused by FIRRTL's procedure.
+  This is caused on io or wire, because these should have all statement clearlly. Implicit-state on these primitives make the error (so, *register* does not make the error because it can hold a value).
 
   **Solution**: You can temporally fix this issue by assigning "*DontCare*" literal which is reserved variable indicating "**Do not Care**". You can use it before assigning value to the port, like as follows;
 ```
   Port/Wire := DontCare
 ```  
-**NOTE**: the ```DontCare``` works every where. If you use this assignment for other purpose then you can meet failed HDL generation.
+**NOTE**: the ```DontCare``` works every where.
+If you use this assignment for other purpose then you can meet failed HDL generation.
 
 ## FIRRTL
 To generate Verilog-File through firrtl, you can do it with;
