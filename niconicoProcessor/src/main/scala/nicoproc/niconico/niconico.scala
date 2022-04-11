@@ -147,7 +147,3 @@ class NicoNico extends Module {
     LSU.io.i_idat 	:= io.idat      	//Loading Data Word
     io.odat       	:= LSU.io.o_odat	//Data Word I/F
 }
-
-object NicoNicoMain extends App {
-  chisel3.Driver.execute(args,()=>new NicoNico)
-}

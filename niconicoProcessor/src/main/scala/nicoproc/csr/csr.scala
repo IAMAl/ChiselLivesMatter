@@ -26,7 +26,7 @@ class CSU extends Module {
     /* Register                         */
     //Register File
     //4x32x32 Bank Configuration
-    val CSR     = RegInit(0.U.asTypeOf(Vec(2, Vec(NumReg, Vec(NumReg, UInt(DataWidth.W))))))
+    val CSR     = RegInit(0.U.asTypeOf(Vec(2, Vec(LogNumReg, Vec(LogNumReg, UInt(DataWidth.W))))))
 
 
      /* Wire                             */
@@ -42,25 +42,23 @@ class CSU extends Module {
     csr     := CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))
 
     when (io.i_vld) {
-        switch (io.i_fc3) {
-            is (FC3_CSRRW) {
-                CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := io.i_rs1
-            }
-            is (FC3_CSRRWI) {
-                CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := imm_z
-            }
-            is (FC3_CSRRS) {
-                CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr | io.i_rs1
-            }
-            is (FC3_CSRRSI) {
-                CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr | imm_z
-            }
-            is (FC3_CSRRC) {
-                CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr & ~io.i_rs1
-            }
-            is (FC3_CSRRCI) {
-                CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr & ~imm_z
-            }
+        when(io.i_fc3 === FC3_CSRRW) {
+            CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := io.i_rs1
+        }
+        .elsewhen (io.i_fc3 === FC3_CSRRWI) {
+            CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := imm_z
+        }
+        .elsewhen (io.i_fc3 === FC3_CSRRS) {
+            CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr | io.i_rs1
+        }
+        .elsewhen (io.i_fc3 === FC3_CSRRSI) {
+            CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr | imm_z
+        }
+        .elsewhen (io.i_fc3 === FC3_CSRRC) {
+            CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr & ~io.i_rs1
+        }
+        .elsewhen (io.i_fc3 === FC3_CSRRCI) {
+            CSR(idx(11, 10))(idx(9, 5))(idx(4, 0))  := csr & ~imm_z
         }
     }
 
@@ -68,5 +66,5 @@ class CSU extends Module {
 
     io.o_wrb    := io.i_vld
 
-    io.i_wrn    := io.i_wrn
+    io.o_wrn    := io.i_wrn
 }

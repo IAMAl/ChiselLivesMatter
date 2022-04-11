@@ -58,7 +58,3 @@ class FCH extends Module {
     io.o_exe  := exe
     io.o_ireq := LdReq.io.Req
 }
-
-object FCHMain extends App {
-  chisel3.Driver.execute(args,()=>new FCH)
-}

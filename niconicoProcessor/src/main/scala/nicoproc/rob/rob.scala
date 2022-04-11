@@ -10,10 +10,11 @@ import chisel3.util._
 import params._
 
 
-class Entry (
-        DataWidth:  Int,
-        LogNumReg:  Int
-    ) extends Bundle {
+class Entry extends Bundle {
+
+    val DataWidth   = params.Parameters.DataWidth
+    val LogNumReg   = params.Parameters.LogNumReg+1
+    
     val V       = RegInit(Bool(), false.B)
     val W       = RegInit(Bool(), false.B)
     val WBRN    = Reg(UInt(LogNumReg.W))
@@ -105,32 +106,29 @@ class ROB extends Module {
     val BFCTRL      = Module(new BuffCtrl(BUFFLENGTH))
 
     // Power of 2 Depth Circular Buffer Memory
-    val BUFF        = Vec(BUFFLENGTH, new Entry(DataWidth, LogNumReg))
+    val BUFF        = Vec(BUFFLENGTH, new Entry)
 
-    val PostDat     = new Entry(DataWidth, LogNumReg)// Output from Memory
+    val PostDat     = new Entry                     // Output from Memory
 
     val Valid       = RegInit(Bool(), false.B)      // Capture Valid
     val Full        = RegInit(Bool(), false.B)      // Capture Full
 
 
     /* Wire                                         */
-    val WPtr        = Wire(UInt(BUFFWIDTH.W))       // Write Pointer
-    val RPtr        = Wire(UInt(BUFFWIDTH.W))       // Read Pointer
+    val WPtr        = Wire(UInt((BUFFWIDTH+1).W))       // Write Pointer
+    val RPtr        = Wire(UInt((BUFFWIDTH+1).W))       // Read Pointer
 
     val We          = Wire(Bool())
-    val Re          = Wire(Bool())
+    val Re          = Wire(Vec(BUFFLENGTH, Bool()))
 
 
     /* Assign                                       */
     //Write-Enable
     We              := io.i_set
 
-    //Read-Enable
-    Re              := !BFCTRL.io.O_Empty && BUFF(RPtr).V && BUFF(RPtr).W
-
     //Controll
     BFCTRL.io.I_We  := We
-    BFCTRL.io.I_Re  := Re
+    BFCTRL.io.I_Re  := Re.asUInt.orR
 
     //Write/Read Pointers
     WPtr            := BFCTRL.io.O_WP
@@ -141,27 +139,41 @@ class ROB extends Module {
     io.o_full       := Full
 
     //Write/Read
-    when (We) {
-        BUFF(WPtr).V    := true.B
-        BUFF(WPtr).WBRN := io.i_wrn
+    for (idx<-0 until BUFFLENGTH by 1) {
+        when (We && (idx.U === WPtr) && (RPtr =/= WPtr)) {
+            BUFF(idx).V     := true.B
+            BUFF(idx).WBRN  := io.i_wrn
+        }
+
+        //Read-Enable
+        when (idx.U === RPtr) {
+            Re(idx) := BUFF(idx).V && BUFF(idx).W
+
+            when (Re(idx)) {
+                BUFF(idx).V := false.B
+                BUFF(idx).W := false.B
+            }
+
+            PostDat.V   := BUFF(idx).V
+            PostDat.W   := BUFF(idx).W
+            PostDat.WBRN:= BUFF(idx).WBRN
+            PostDat.Data:= BUFF(idx).Data
+        }
     }
-    when (Re) {
-        BUFF(RPtr).V    := false.B
-        BUFF(RPtr).W    := false.B
-    }
-    for (index<-0 until BUFFLENGTH) {
+
+    for (index<-0 until BUFFLENGTH by 1) {
         //Write Back
         when (io.i_wrb_c && BUFF(index).V && (io.i_wrn_c === BUFF(index).WBRN)) {
-            BUFF(index).Data:= io.i_wrb_c
+            BUFF(index).Data    := io.i_wrb_c
         }
-        when (io.i_wrb_a && BUFF(index).V && (io.i_wrn_a === BUFF(index).WBRN)) {
-            BUFF(index).Data:= io.i_wrb_a
+        .elsewhen (io.i_wrb_a && BUFF(index).V && (io.i_wrn_a === BUFF(index).WBRN)) {
+            BUFF(index).Data    := io.i_wrb_a
         }
-        when (io.i_wrb_b && BUFF(index).V && (io.i_wrn_b === BUFF(index).WBRN)) {
-            BUFF(index).Data:= io.i_wrb_b
+        .elsewhen (io.i_wrb_b && BUFF(index).V && (io.i_wrn_b === BUFF(index).WBRN)) {
+            BUFF(index).Data    := io.i_wrb_b
         }
-        when (io.i_wrb_m && BUFF(index).V && (io.i_wrn_m === BUFF(index).WBRN)) {
-            BUFF(index).Data:= io.i_wrb_m
+        .elsewhen (io.i_wrb_m && BUFF(index).V && (io.i_wrn_m === BUFF(index).WBRN)) {
+            BUFF(index).Data    := io.i_wrb_m
         }
 
         //Bypassing
@@ -186,7 +198,6 @@ class ROB extends Module {
     }
 
     //Read Data
-    PostDat         := BUFF(RPtr)
     io.o_dat        := PostDat.Data
     io.o_wrn        := PostDat.WBRN
     io.o_wrb        := PostDat.V && PostDat.W

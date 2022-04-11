@@ -150,7 +150,3 @@ class BRU extends Module {
     }
     io.o_wrn    := wrn
 }
-
-object BRUMain extends App {
-  chisel3.Driver.execute(args,()=>new BRU)
-}

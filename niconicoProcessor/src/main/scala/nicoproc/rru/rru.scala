@@ -55,10 +55,10 @@ class Decoder_ (
 
     for (idx<-0 until NumInputs) {
         when (idx.U === io.i_wrn) {
-            io.o_grt    := true.B
+            io.o_grt(idx)   := true.B
         }
         .otherwise {
-            io.o_grt    := false.B
+            io.o_grt(idx)   := false.B
         }
     }
 }
@@ -148,7 +148,7 @@ class Arbiter_ (
         when (io.i_req(in_no) && !invalid(in_no).reduce(_ | _).asBool && !v_exist) {
             valid(in_no)    := true.B
         }
-        Encoder.io.i_data   := io.i_req(in_no) && !invalid(in_no).reduce(_ | _).asBool && !v_exist
+        Encoder.io.i_data(in_no)    := io.i_req(in_no) && !invalid(in_no).reduce(_ | _).asBool && !v_exist
     }
 
 
@@ -159,13 +159,6 @@ class Arbiter_ (
     //// Ourput Flag
     io.o_full           := valid.asUInt.andR
     io.o_empty          := !(valid.asUInt() =/= 0.U)
-}
-
-
-class RenameEntry (
-        LogNumReg:  Int
-    ) extends Bundle {
-    val RFN         = Reg(UInt(LogNumReg.W))
 }
 
 
@@ -196,8 +189,7 @@ class RRU extends Module {
 
     //Rename Handler
     val Arbiter     = Module(new Arbiter_(PNumReg))
-    val Encoder     = Module(new Encoder_(PLogNumReg))
-    val Decoder     = Module(new Decoder_(PLogNumReg))
+    val Decoder     = Module(new Decoder_(PNumReg))
 
 
     /* Register                         */
@@ -214,7 +206,7 @@ class RRU extends Module {
     val Hzd         = RegInit(Bool(), false.B)  //Hazard for Cond-Branch
 
     //Rename Table
-    val RRFN        = Reg(Vec(PNumReg, new RenameEntry(PLogNumReg)))
+    val RRFN        = Reg(Vec(PNumReg, UInt(PLogNumReg.W)))
 
 
     /* Wire                             */
@@ -274,22 +266,25 @@ class RRU extends Module {
     //Register to Rename Table
     Decoder.io.i_req    := io.i_wrb
     Decoder.io.i_wrn    := io.i_wbn
-    Arbiter.io.i_req    := io.i_vld && (reg_req || cond)
-    Arbiter.io.I_Rls    := Decoder.io.o_grt
+    
     full                := Arbiter.io.o_full
     empty               := Arbiter.io.o_empty
     for (idx<-0 until PNumReg) {
+        //Register to Rename Table
+        Arbiter.io.i_req(idx)   := io.i_vld && (reg_req || cond) && Decoder.io.o_grt(idx)
+        Arbiter.io.I_Rls(idx)   := Decoder.io.o_grt(idx)
+
         when (io.i_vld && reg_req && !full) {
             when (cond) {
                 //Conditional Branch then use this entry as a Flag
-                RRFN(Arbiter.io.o_grt).RFN  := (PNumReg-1).U
+                RRFN(Arbiter.io.o_grt)  := (PNumReg-1).U
             }
             .otherwise {
-                RRFN(Arbiter.io.o_grt).RFN  := wno
+                RRFN(Arbiter.io.o_grt)  := wno
             }
         }
     }
-    Wno         := Decoder.io.o_grt
+    Wno         := io.i_wbn
 
     //Write-Back Enable Assertion
     when (  (UnitID === (params.Parameters.OP_RandI).U) ||
@@ -317,13 +312,13 @@ class RRU extends Module {
 
     //Output Renamed Register No.
     for (idx<-0 until PLogNumReg) {
-        when (rn1 === RRFN(idx).RFN) {
-            Rn1 := RRFN(idx).RFN
+        when (rn1 === RRFN(idx)) {
+            Rn1 := RRFN(idx)
         }
-        when (rn2 === RRFN(idx).RFN) {
-            Rn2 := RRFN(idx).RFN
+        when (rn2 === RRFN(idx)) {
+            Rn2 := RRFN(idx)
         }
-        when ((PNumReg-1).U === RRFN(idx).RFN) {
+        when ((PNumReg-1).U === RRFN(idx)) {
             hzrd(idx)   := Arbiter.io.o_vld(idx)
         }
         .otherwise {

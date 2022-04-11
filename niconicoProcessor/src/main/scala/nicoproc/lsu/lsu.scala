@@ -243,7 +243,3 @@ class LSU extends Module {
     io.o_wrn    := wrn
     io.o_wrb    := LdDone
 }
-
-object MEMMain extends App {
-  chisel3.Driver.execute(args,()=>new LSU)
-}
