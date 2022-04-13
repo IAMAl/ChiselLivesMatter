@@ -54,6 +54,8 @@ class NicoNico extends Module {
     //Register Rename
     RRU.io.i_vld  	:= FCH.io.o_exe 	//Validate Scheduler
     RRU.io.i_ins  	:= FCH.io.o_ins 	//Feed Instruction Word
+    RRU.io.i_wbn    := ROB.io.o_wrn     //WB Reg No.
+    RRU.io.i_wrb    := ROB.io.o_wrb 	//Write-enable
 
 
     //Stage-3
@@ -67,9 +69,11 @@ class NicoNico extends Module {
     REG.io.i_fc3  	:= RRU.io.o_fc3 	//Func3 Value
     REG.io.i_fc7  	:= RRU.io.o_fc7 	//Func7 Value
     REG.io.i_wno  	:= RRU.io.o_wno 	//Write Register Number
+    REG.io.i_wrb_r  := ROB.io.o_wrb     //WB Req
 
     //Route to Exec Units
     URT.io.i_opc  	:= RRU.io.o_opc 	//Routing by Opcode
+    URT.io.i_fc3    := RRU.io.o_fc3 	//Func3 Value
 
 
     //Stage-4
@@ -77,18 +81,24 @@ class NicoNico extends Module {
     CSU.io.i_vld	:= REG.io.o_exe && URT.io.o_is_CSU  				//Validate CSU
     CSU.io.i_rs1	:= Mux(ROB.io.o_bps1, ROB.io.o_dat1, REG.io.o_cs1)	//Operand Data Word-1
     CSU.io.i_imm	:= REG.io.o_imm										//Immediate Value
+    CSU.io.i_fc3    := REG.io.o_fc3                                     //Func3 Value
+    CSU.io.i_wrn    := REG.io.o_wrn                                     //WB Reg No.
+    CSU.io.i_rn1    := REG.io.o_rn1
 
     //Arithmetic/Logic Unit
     ALU.io.i_UID	:= URT.io.o_UID										//Executing Datapath ID
     ALU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_ALU  				//Validate ALU
+    ALU.io.i_wrn    := REG.io.o_wrn                                     //WB Reg No.
     ALU.io.i_fc3  	:= REG.io.o_fc3										//Func3 Value
     ALU.io.i_fc7  	:= REG.io.o_fc7										//Func7 Value
+    ALU.io.i_imm    := REG.io.o_imm										//Immediate Value
     ALU.io.i_rs1  	:= Mux(ROB.io.o_bps1, ROB.io.o_dat1, REG.io.o_as1)	//Operand Data Word-1
     ALU.io.i_rs2  	:= Mux(ROB.io.o_bps2, ROB.io.o_dat2, REG.io.o_as2)	//Operand Data Word-2
 
     //Load/Store Unit
     LSU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_LSU  				//Validate LSU
     LSU.io.i_opc  	:= REG.io.o_opcode									//Opcode
+    LSU.io.i_wrn    := REG.io.o_wrn                                     //WB Reg No.
     LSU.io.i_fc3  	:= REG.io.o_fc3 									//Func3 Value
     LSU.io.i_rs1  	:= Mux(ROB.io.o_bps1, ROB.io.o_dat1, REG.io.o_ls1)	//Operand Data Word-1
     LSU.io.i_rs2  	:= Mux(ROB.io.o_bps2, ROB.io.o_dat2, REG.io.o_ls2)	//Operand Data Word-2
@@ -97,8 +107,10 @@ class NicoNico extends Module {
     //Branch Unit
     BRU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_BRU  				//Validate BRU
     BRU.io.i_jal  	:= REG.io.o_opcode 							        //Opcode
+    BRU.io.i_wrn    := REG.io.o_wrn                                     //WB Reg No.
     BRU.io.i_rs1  	:= Mux(ROB.io.o_bps1, ROB.io.o_dat1, REG.io.o_bs1)	//Operand Data Word-1
     BRU.io.i_rs2  	:= Mux(ROB.io.o_bps2, ROB.io.o_dat2, REG.io.o_bs2)	//Operand Data Word-2
+    BRU.io.i_fc3    := REG.io.o_fc3                                     //Func3 Value
     BRU.io.i_imm  	:= REG.io.o_imm 									//Immediate Value
 
 
@@ -130,6 +142,7 @@ class NicoNico extends Module {
     REG.io.i_wed	:= ROB.io.o_wrb 	//Write-enable
 	REG.io.i_wrn 	:= ROB.io.o_wrn		//Write-index
     REG.io.i_wrb_d	:= ROB.io.o_dat		//Write-Data
+    REG.io.i_pc     := BRU.io.o_pc      //PC Value
 
 
     //Instruction Memory Interface

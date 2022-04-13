@@ -32,14 +32,14 @@ object Parameters {
     val LSB_Opc         = 0
     val MSB_Opc         = OpcWidth - 1
     val LSB_Dst         = OpcWidth
-    val MSB_Dst         = OpcWidth +              LogNumReg - 1
-    val LSB_Rs1         = OpcWidth + Fc3Width
-    val MSB_Rs1         = OpcWidth + Fc3Width +   LogNumReg - 1
-    val LSB_Rs2         = OpcWidth + Fc3Width + 2*LogNumReg
-    val MSB_Rs2         = OpcWidth + Fc3Width + 3*LogNumReg - 1
-    val LSB_Fc3         = OpcWidth +              LogNumReg
-    val MSB_Fc3         = OpcWidth + Fc3Width +   LogNumReg - 1
-    val LSB_Fc7         = OpcWidth + Fc3Width + 3*LogNumReg
+    val MSB_Dst         = LSB_Dst + LogNumReg - 1
+    val LSB_Fc3         = MSB_Dst
+    val MSB_Fc3         = LSB_Fc3 + Fc3Width - 1
+    val LSB_Rs1         = MSB_Fc3
+    val MSB_Rs1         = LSB_Rs1 + LogNumReg - 1
+    val LSB_Rs2         = MSB_Rs1 
+    val MSB_Rs2         = LSB_Rs2 + LogNumReg - 1
+    val LSB_Fc7         = MSB_Rs2
     val MSB_Fc7         = ISAWidth - 1
 
     //Opcode Type

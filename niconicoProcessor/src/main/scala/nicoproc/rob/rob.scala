@@ -15,10 +15,10 @@ class Entry extends Bundle {
     val DataWidth   = params.Parameters.DataWidth
     val LogNumReg   = params.Parameters.LogNumReg+1
     
-    val V       = RegInit(Bool(), false.B)
-    val W       = RegInit(Bool(), false.B)
-    val WBRN    = Reg(UInt(LogNumReg.W))
-    val Data    = Reg(UInt(DataWidth.W))
+    val V       = Bool()
+    val W       = Bool()
+    val WBRN    = UInt(LogNumReg.W)
+    val Data    = UInt(DataWidth.W)
 }
 
 
@@ -38,7 +38,6 @@ class BuffCtrl (
         val O_RP        = Output(UInt(BUFFWIDTH.W))         // Read-Pointer
         val O_Full      = Output(Bool())                    // Full Flag
         val O_Empty     = Output(Bool())                    // Empty Flag
-        val O_Thrshld   = Output(Bool())                    // Empty Flag
     })
 
 
@@ -106,17 +105,17 @@ class ROB extends Module {
     val BFCTRL      = Module(new BuffCtrl(BUFFLENGTH))
 
     // Power of 2 Depth Circular Buffer Memory
-    val BUFF        = Vec(BUFFLENGTH, new Entry)
+    val BUFF        = RegInit(0.U.asTypeOf((Vec(BUFFLENGTH, new Entry))))
 
-    val PostDat     = new Entry                     // Output from Memory
+    val PostDat     = Reg(new Entry)                // Output from Memory
 
     val Valid       = RegInit(Bool(), false.B)      // Capture Valid
     val Full        = RegInit(Bool(), false.B)      // Capture Full
 
 
     /* Wire                                         */
-    val WPtr        = Wire(UInt((BUFFWIDTH+1).W))       // Write Pointer
-    val RPtr        = Wire(UInt((BUFFWIDTH+1).W))       // Read Pointer
+    val WPtr        = Wire(UInt((BUFFWIDTH+1).W))   // Write Pointer
+    val RPtr        = Wire(UInt((BUFFWIDTH+1).W))   // Read Pointer
 
     val We          = Wire(Bool())
     val Re          = Wire(Vec(BUFFLENGTH, Bool()))
@@ -139,6 +138,7 @@ class ROB extends Module {
     io.o_full       := Full
 
     //Write/Read
+    Re  := DontCare
     for (idx<-0 until BUFFLENGTH by 1) {
         when (We && (idx.U === WPtr) && (RPtr =/= WPtr)) {
             BUFF(idx).V     := true.B
@@ -177,22 +177,18 @@ class ROB extends Module {
         }
 
         //Bypassing
-        when (io.i_vld && BUFF(index).V && BUFF(index).W) {
+        io.o_dat1 := DontCare
+        io.o_dat2 := DontCare
+        io.o_bps1 := DontCare
+        io.o_bps2 := DontCare
+        when (BUFF(index).V && BUFF(index).W) {
             when (io.i_rs1 === BUFF(index).WBRN) {
                 io.o_dat1 := BUFF(index).Data
                 io.o_bps1 := true.B
             }
-            .otherwise {
-                io.o_dat1 := 0.U
-                io.o_bps1 := false.B
-            }
             when (io.i_rs2 === BUFF(index).WBRN) {
                 io.o_dat2 := BUFF(index).Data
                 io.o_bps2 := true.B
-            }
-            .otherwise {
-                io.o_dat2 := 0.U
-                io.o_bps2 := false.B
             }
         }
     }

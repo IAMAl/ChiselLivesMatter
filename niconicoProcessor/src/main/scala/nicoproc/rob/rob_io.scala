@@ -11,7 +11,6 @@ class ROB_IO extends Bundle {
     val DataWidth   = params.Parameters.DataWidth
     val LogNumReg   = params.Parameters.PLogNumReg
 
-    val i_vld       = Input( Bool())            //
     val i_set       = Input( Bool())            //Set WB Reg No
     val i_wrn       = Input( UInt(LogNumReg.W)) //WB Reg No
 

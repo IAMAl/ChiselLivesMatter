@@ -37,6 +37,9 @@ class REG extends Module {
     val alu     = Reg(Bool())                                   //Destination
     val lsu     = Reg(Bool())                                   //Destination
     val bru     = Reg(Bool())                                   //Destination
+    val csu     = Reg(Bool())                                   //Destination
+
+    val wrn     = Reg(UInt((params.Parameters.LogNumReg).W))
 
 
     /* Wire                             */
@@ -152,6 +155,23 @@ class REG extends Module {
         io.o_bs2    := 0.U
     }
 
+    //Branch Source Operands
+    csu         := (io.i_opc === (params.Parameters.OP_CSR).U)
+    when (csu) {
+        //Set CSR Value
+        io.o_cs1    := rs1
+        io.o_cs2    := rs2
+    }
+    .otherwise {
+        //Otherwise NOT Send Value
+        io.o_cs1    := 0.U
+        io.o_cs2    := 0.U
+    }    
+
     //Immediate
     io.o_imm    := r_imm
+
+    //WB Reg No.
+    wrn         := io.i_wno
+    io.o_wrn    := wrn
 }

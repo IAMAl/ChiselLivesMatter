@@ -247,16 +247,16 @@ class RRU extends Module {
     UnitID      := ISA_Opcode.io.o_OpcodeType
 
     //Flag: Instruction is Conditional Branch
-    cond        := (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U)
+    cond        := (fc3 === (params.Parameters.OP_BRJMP).U)
 
     //Flag: Reading Immediate (WN) at Store or Branch
-    imm_dst     := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_STORE).U) ||
-                    (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U))
+    imm_dst     := ((fc3 === (params.Parameters.OP_STORE).U) ||
+                    (fc3 === (params.Parameters.OP_BRJMP).U))
 
     //Flag: Reading Immediate (RN1/RN2) at Link, Branch or ALU
-    imm_src     := ((opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_JAL).U)   ||
-                    (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_BRJMP).U) ||
-                    (opc(MSB_Fc3, LSB_Fc3) === (params.Parameters.OP_RandI).U))
+    imm_src     := ((fc3 === (params.Parameters.OP_JAL).U)   ||
+                    (fc3 === (params.Parameters.OP_BRJMP).U) ||
+                    (fc3 === (params.Parameters.OP_RandI).U))
 
 
     //// Register Renaming

@@ -28,6 +28,7 @@ class REG_IO extends Bundle {
     val i_fc3   = Input( UInt(Fc3Width.W))      //Function-3 Port
     val i_fc7   = Input( UInt(Fc7Width.W))      //Function-7 Port
 
+    val o_wrn   = Output(UInt(PLogNumReg.W))    //Write-back Reg No.
     val o_rn1   = Output(UInt(PLogNumReg.W))    //Register Read No-1
     val o_rn2   = Output(UInt(PLogNumReg.W))    //Register Read No-2
     val o_fc3   = Output(UInt(Fc3Width.W))      //Function-3 Port
@@ -38,7 +39,7 @@ class REG_IO extends Bundle {
     val i_wrn   = Input( UInt(PLogNumReg.W))    //Register Write No
     val i_wrb_d = Input( UInt(DataWidth.W))     //Write-back Data
 
-    val i_pc    = Output(UInt(AddrWidth.W))     //Program Counter (PC) Port
+    val i_pc    = Input( UInt(AddrWidth.W))     //Program Counter (PC) Port
 
     val o_as1   = Output(UInt(DataWidth.W))     //ALU Operand-1 Port
     val o_as2   = Output(UInt(DataWidth.W))     //ALU Operand-2 Port
@@ -50,5 +51,5 @@ class REG_IO extends Bundle {
     val o_cs2   = Output(UInt(DataWidth.W))     //CSR Operand-2 Port
 
     val o_opcode= Output(UInt(OpcWidth.W))      //Opcode
-    val o_exe   = Output(Bool())                //
+    val o_exe   = Output(Bool())                //Exe En
 }
