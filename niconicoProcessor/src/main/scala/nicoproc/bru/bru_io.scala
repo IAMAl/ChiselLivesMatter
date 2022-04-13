@@ -15,6 +15,7 @@ class BRU_IO extends Bundle {
     val PLogNumReg  = params.Parameters.PLogNumReg
     val AddrWidth   = params.Parameters.AddrWidth
 
+    val i_exe = Input( Bool())              //
     val i_vld = Input( Bool())              //BRJ Operation Validation
     val i_rs1 = Input( UInt(DataWidth.W))   //Source Operand-1 Port
     val i_rs2 = Input( UInt(DataWidth.W))   //Source Operand-2 Port

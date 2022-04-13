@@ -20,12 +20,12 @@ class Test_niconico extends FlatSpec with ChiselScalatestTester with Matchers {
             var cycle = 0
             var ireq = false
             var iadr = 0
-            var inst = 0
+            var inst = ""
             var dreq = false
             var dadr = 0
-            var data = 0
+            var data = ""
             var stor = false
-            for (cycle<-0 until 16) {
+            for (cycle<-0 until 64) {
 
                 //Boot: Kicking Start
                 if (cycle == 8) {
@@ -37,8 +37,9 @@ class Test_niconico extends FlatSpec with ChiselScalatestTester with Matchers {
 
                 //Instr Fetch
                 if (ireq) {
-                    inst = Integer.parseInt(program(iadr), 16)
-                    dut.io.inst.poke(   inst.U    )
+                    //inst = Integer.parseUnsignedInt(program(iadr), 16)
+                    inst = "h"+program(iadr)
+                    dut.io.inst.poke(   inst.U      )
                     dut.io.iack.poke(   true.B      )
                 }
                 else {
@@ -51,8 +52,8 @@ class Test_niconico extends FlatSpec with ChiselScalatestTester with Matchers {
                     dut.io.dack.poke(   true.B      )
                 }
                 else if (dreq) {
-                    data = Integer.parseInt(program(dadr), 16)
-                    dut.io.idat.poke(   true.B      )
+                    data = "h"+program(dadr)
+                    dut.io.idat.poke(   data.U      )
                     dut.io.dack.poke(   true.B      )
                 }
                 else {

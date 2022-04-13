@@ -70,55 +70,61 @@ class BRU extends Module {
 
     BRC     := DontCare
     LNK     := DontCare
-    when (io.i_vld) {
+    when (io.i_vld || io.i_exe) {
         //Program Counter and Link
-        when (io.i_jal === JAL) {
+        when (io.i_exe && (io.i_jal === JAL)) {
             //Jump and Link
             PC  := jmp.asUInt
             LNK := PC + 4.U
         }
-        .elsewhen (io.i_jal === JALR) {
+        .elsewhen (io.i_exe && (io.i_jal === JALR)) {
             //Jump and Link Register
             //Indirect-Jump
             PC  := (io.i_rs1.asSInt + jmp).asUInt
             LNK := PC + 4.U
         }
-        .elsewhen (BRC && (io.i_jal === 0.U)) {
+        .elsewhen (io.i_vld && (BRC && (io.i_jal === 0.U))){
             //Branch Taken
             PC  := (PC.asSInt() + imm.asSInt()).asUInt()
             LNK := 0.U
         }
-        .elsewhen (!BRC && (io.i_jal === 0.U)) {
+        .elsewhen (io.i_vld && (!BRC && (io.i_jal === 0.U))) {
             //Branch NOT Taken
+            PC  := PC + 4.U
+            LNK := 0.U
+        }
+        .elsewhen (io.i_exe) {
             PC  := PC + 4.U
             LNK := 0.U
         }
 
         //Branch Condition
-        switch(io.i_fc3) {
-            is((params.Parameters.FC3_BEQ).U) {
-                //Equal (Signed)
-                BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt)
-            }
-            is((params.Parameters.FC3_BNE).U) {
-                //Not Equal (Signed)
-                BRC    := (io.i_rs1.asSInt =/= io.i_rs2.asSInt)
-            }
-            is((params.Parameters.FC3_BLT).U) {
-                //Less Than (Signed)
-                BRC    := (io.i_rs1.asSInt <   io.i_rs2.asSInt)
-            }
-            is((params.Parameters.FC3_BGE).U) {
-                //Greater Than or Equal (Signed)
-                BRC    := (io.i_rs1.asSInt >=  io.i_rs2.asSInt)
-            }
-            is((params.Parameters.FC3_BLTU).U) {
-                //Less Than (Unsigned)
-                BRC    := (io.i_rs1 <  io.i_rs2)
-            }
-            is((params.Parameters.FC3_BGEU).U) {
-                //Greater Than or Equal (Unsigned)
-                BRC    := (io.i_rs1 >= io.i_rs2)
+        when (io.i_vld) {
+            switch(io.i_fc3) {
+                is((params.Parameters.FC3_BEQ).U) {
+                    //Equal (Signed)
+                    BRC    := (io.i_rs1.asSInt === io.i_rs2.asSInt)
+                }
+                is((params.Parameters.FC3_BNE).U) {
+                    //Not Equal (Signed)
+                    BRC    := (io.i_rs1.asSInt =/= io.i_rs2.asSInt)
+                }
+                is((params.Parameters.FC3_BLT).U) {
+                    //Less Than (Signed)
+                    BRC    := (io.i_rs1.asSInt <   io.i_rs2.asSInt)
+                }
+                is((params.Parameters.FC3_BGE).U) {
+                    //Greater Than or Equal (Signed)
+                    BRC    := (io.i_rs1.asSInt >=  io.i_rs2.asSInt)
+                }
+                is((params.Parameters.FC3_BLTU).U) {
+                    //Less Than (Unsigned)
+                    BRC    := (io.i_rs1 <  io.i_rs2)
+                }
+                is((params.Parameters.FC3_BGEU).U) {
+                    //Greater Than or Equal (Unsigned)
+                    BRC    := (io.i_rs1 >= io.i_rs2)
+                }
             }
         }
     }

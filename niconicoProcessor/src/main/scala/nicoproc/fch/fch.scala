@@ -55,6 +55,6 @@ class FCH extends Module {
 
     //Output
     io.o_ins  := IR
-    io.o_exe  := exe
+    io.o_exe  := LdReq.io.LdValid && !io.i_brc && !stall
     io.o_ireq := LdReq.io.Req
 }

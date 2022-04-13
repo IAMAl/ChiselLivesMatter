@@ -105,6 +105,7 @@ class NicoNico extends Module {
     LSU.io.i_imm  	:= REG.io.o_imm 									//Immediate Value
 
     //Branch Unit
+    BRU.io.i_exe    := FCH.io.o_exe
     BRU.io.i_vld  	:= REG.io.o_exe && URT.io.o_is_BRU  				//Validate BRU
     BRU.io.i_jal  	:= REG.io.o_opcode 							        //Opcode
     BRU.io.i_wrn    := REG.io.o_wrn                                     //WB Reg No.
