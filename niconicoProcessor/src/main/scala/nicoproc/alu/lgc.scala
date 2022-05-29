@@ -11,30 +11,30 @@ import isa._
 class Lgc extends Module {
 
 
-    /* I/O                                  */
-    val io = IO(new ALU_IO)
+	/* I/O													*/
+	val io = IO(new ALU_IO)
 
 
-    /* Assign                               */
-    io.o_dst  := DontCare
-    when (io.i_vld) {
-        switch (io.i_fc3) {
-            is(params.Parameters.FC3_XOR.U) {
-                //Bit-Wise XOR
-                io.o_dst   := io.i_rs1 ^ io.i_rs2
-            }
-            is(params.Parameters.FC3_OR.U) {
-                //Bit-Wise OR
-                io.o_dst   := io.i_rs1 | io.i_rs2
-            }
-            is(params.Parameters.FC3_AND.U) {
-                //Bit-Wise AND
-                io.o_dst   := io.i_rs1 & io.i_rs2
-            }
-        }
-    }
-    .otherwise {
-        //NOP
-        io.o_dst   := 0.U
-    }
+	/* Assign												*/
+	io.o_dst	:= DontCare
+	when (io.i_vld) {
+		switch (io.i_fc3) {
+			is(params.Parameters.FC3_XOR.U) {
+				//Bit-Wise XOR
+				io.o_dst	 := io.i_rs1 ^ io.i_rs2
+			}
+			is(params.Parameters.FC3_OR.U) {
+				//Bit-Wise OR
+				io.o_dst	 := io.i_rs1 | io.i_rs2
+			}
+			is(params.Parameters.FC3_AND.U) {
+				//Bit-Wise AND
+				io.o_dst	 := io.i_rs1 & io.i_rs2
+			}
+		}
+	}
+	.otherwise {
+		//NOP
+		io.o_dst	 := 0.U
+	}
 }
